@@ -1,28 +1,28 @@
 <?php
 /**
-* 2007-2024 PrestaShop
-*
-* NOTICE OF LICENSE
-*
-* This source file is subject to the Academic Free License (AFL 3.0)
-* that is bundled with this package in the file LICENSE.txt.
-* It is also available through the world-wide-web at this URL:
-* http://opensource.org/licenses/afl-3.0.php
-* If you did not receive a copy of the license and are unable to
-* obtain it through the world-wide-web, please send an email
-* to license@prestashop.com so we can send you a copy immediately.
-*
-* DISCLAIMER
-*
-* Do not edit or add to this file if you wish to upgrade PrestaShop to newer
-* versions in the future. If you wish to customize PrestaShop for your
-* needs please refer to http://www.prestashop.com for more information.
-*
-*  @author    PrestaShop SA <contact@prestashop.com>
-*  @copyright 2007-2024 PrestaShop SA
-*  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
-*  International Registered Trademark & Property of PrestaShop SA
-*/
+ * 2007-2024 PrestaShop
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Academic Free License (AFL 3.0)
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/afl-3.0.php
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to license@prestashop.com so we can send you a copy immediately.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade PrestaShop to newer
+ * versions in the future. If you wish to customize PrestaShop for your
+ * needs please refer to http://www.prestashop.com for more information.
+ *
+ *  @author    PrestaShop SA <contact@prestashop.com>
+ *  @copyright 2007-2024 PrestaShop SA
+ *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ *  International Registered Trademark & Property of PrestaShop SA
+ */
 
 if (!defined('_PS_VERSION_')) {
     exit;
@@ -34,7 +34,7 @@ class Channelengine extends Module
 
     public function __construct()
     {
-        $this->name = $this->l('channelengine');
+        $this->name = 'channelengine';
         $this->tab = 'administration';
         $this->version = '1.0.0';
         $this->author = 'Filip Kojic';
@@ -53,51 +53,55 @@ class Channelengine extends Module
         $this->ps_versions_compliancy = array('min' => '8.1', 'max' => _PS_VERSION_);
     }
 
-    /**
-     * Don't forget to create update methods if needed:
-     * http://doc.prestashop.com/display/PS16/Enabling+the+Auto-Update
-     */
     public function install()
     {
-        Configuration::updateValue('CHANNELENGINE_LIVE_MODE', false);
-
         return parent::install() &&
             $this->registerHook('header') &&
-            $this->registerHook('displayBackOfficeHeader');
+            $this->registerHook('displayBackOfficeHeader') &&
+            $this->installTab('AdminParentModulesSf', 'AdminChannelEngine', 'ChannelEngine');
+    }
+
+    private function installTab($parent, $class_name, $name)
+    {
+        $tab = new Tab();
+        $tab->id_parent = (int) Tab::getIdFromClassName($parent);
+        $tab->class_name = $class_name;
+        $tab->module = $this->name;
+        $tab->active = 1;
+
+        foreach (Language::getLanguages(true) as $lang) {
+            $tab->name[$lang['id_lang']] = $name;
+        }
+
+        return $tab->add();
     }
 
     public function uninstall()
     {
         Configuration::deleteByName('CHANNELENGINE_LIVE_MODE');
-
-        return parent::uninstall();
+        return parent::uninstall() && $this->uninstallTab('AdminChannelEngine');
     }
 
-    /**
-     * Load the configuration form
-     */
+    private function uninstallTab($class_name)
+    {
+        $id_tab = (int) Tab::getIdFromClassName($class_name);
+        if ($id_tab) {
+            $tab = new Tab($id_tab);
+            return $tab->delete();
+        }
+        return false;
+    }
+
     public function getContent()
     {
-        /**
-         * If values have been submitted in the form, process.
-         */
-        if (((bool)Tools::isSubmit('submitChannelengineModule')) == true) {
+        if (Tools::isSubmit('submitChannelengineModule')) {
             $this->postProcess();
         }
 
-        $this->context->smarty->assign('module_dir', $this->_path);
-
-        $output = $this->context->smarty->fetch($this->local_path.'views/templates/admin/configure.tpl');
-
-        \Tools::clearAllCache();
-
+        // Prikazivanje hello world (configure.tpl) stranice
         return $this->display(__FILE__, 'views/templates/admin/configure.tpl');
-        return $output.$this->renderForm();
     }
 
-    /**
-     * Create the form that will be displayed in the configuration of your module.
-     */
     protected function renderForm()
     {
         $helper = new HelperForm();
@@ -123,16 +127,13 @@ class Channelengine extends Module
         return $helper->generateForm(array($this->getConfigForm()));
     }
 
-    /**
-     * Create the structure of your form.
-     */
     protected function getConfigForm()
     {
         return array(
             'form' => array(
                 'legend' => array(
-                'title' => $this->l('Settings'),
-                'icon' => 'icon-cogs',
+                    'title' => $this->l('Settings'),
+                    'icon' => 'icon-cogs',
                 ),
                 'input' => array(
                     array(
@@ -175,9 +176,6 @@ class Channelengine extends Module
         );
     }
 
-    /**
-     * Set values for the inputs.
-     */
     protected function getConfigFormValues()
     {
         return array(
@@ -187,9 +185,6 @@ class Channelengine extends Module
         );
     }
 
-    /**
-     * Save form data.
-     */
     protected function postProcess()
     {
         $form_values = $this->getConfigFormValues();
@@ -199,9 +194,6 @@ class Channelengine extends Module
         }
     }
 
-    /**
-    * Add the CSS & JavaScript files you want to be loaded in the BO.
-    */
     public function hookDisplayBackOfficeHeader()
     {
         if (Tools::getValue('configure') == $this->name) {
@@ -210,9 +202,6 @@ class Channelengine extends Module
         }
     }
 
-    /**
-     * Add the CSS & JavaScript files you want to be added on the FO.
-     */
     public function hookHeader()
     {
         $this->context->controller->addJS($this->_path.'/views/js/front.js');

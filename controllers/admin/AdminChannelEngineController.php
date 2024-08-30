@@ -12,17 +12,13 @@ class AdminChannelEngineController extends ModuleAdminController
     {
         parent::initContent();
 
-        // Dodavanje promenljive 'content' u Smarty
+        // Prikazivanje hello world (configure.tpl) stranice
         $this->context->smarty->assign(array(
             'content' => 'Hello World',
         ));
 
-        // Učitavanje i prikaz šablona
-
-        return $this->display(__FILE__  , 'hello.tpl');
-        $output = $this->context->smarty->fetch($this->module->getLocalPath().'views/templates/admin/hello.tpl');
-
-        // Postavljanje prikazanog sadržaja kao sadržaja stranice
+        // Prikaz hello world stranice
+        $output = $this->context->smarty->fetch($this->module->getLocalPath().'views/templates/admin/configure.tpl');
         $this->context->smarty->assign('content', $output);
     }
 }
