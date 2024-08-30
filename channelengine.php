@@ -34,7 +34,7 @@ class Channelengine extends Module
 
     public function __construct()
     {
-        $this->name = 'channelengine';
+        $this->name = $this->l('channelengine');
         $this->tab = 'administration';
         $this->version = '1.0.0';
         $this->author = 'Filip Kojic';
@@ -89,6 +89,9 @@ class Channelengine extends Module
 
         $output = $this->context->smarty->fetch($this->local_path.'views/templates/admin/configure.tpl');
 
+        \Tools::clearAllCache();
+
+        return $this->display(__FILE__, 'views/templates/admin/configure.tpl');
         return $output.$this->renderForm();
     }
 
