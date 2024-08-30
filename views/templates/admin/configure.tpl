@@ -4,6 +4,6 @@
     <img src="{$module_dir}views/img/logo.png" alt="Channel Engine Logo" class="welcome-logo">
     <h1 class="welcome-title">Welcome to ChannelEngine</h1>
     <p class="welcome-message">Connect, sync product data to ChannelEngine and orders to your shop.</p>
-    <button class="welcome-button">Connect</button>
+    <button onclick="window.location.href='{$link->getAdminLink('AdminChannelEngine')}&action=displayLogin'" class="connect-button">Connect</button>
 </div>
 

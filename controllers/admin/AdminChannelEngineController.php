@@ -12,18 +12,44 @@ class AdminChannelEngineController extends ModuleAdminController
     {
         parent::initContent();
 
-        // Prikazivanje hello world (configure.tpl) stranice
-        $this->context->smarty->assign([
-            'module_dir' => $this->module->getPathUri(),  // Popravka module_dir
-            //'ps_version' => _PS_VERSION_,
-        ]);
+        // Provera parametra 'action' iz URL-a
+        $action = Tools::getValue('action');
 
-        // Fetch the content
-        $output = $this->context->smarty->fetch($this->module->getLocalPath().'views/templates/admin/configure.tpl');
-        $this->context->smarty->assign('content', $output);
+        if ($action == 'displayLogin') {
+            // Prikazivanje login stranice
+            $this->context->smarty->assign([
+                'module_dir' => $this->module->getPathUri(),
+            ]);
+
+            // Fetch login.tpl template
+            $output = $this->context->smarty->fetch($this->module->getLocalPath().'views/templates/admin/login.tpl');
+            $this->context->smarty->assign('content', $output);
+        } else {
+            // Prikazivanje welcome stranice (configure.tpl)
+            $this->context->smarty->assign([
+                'module_dir' => $this->module->getPathUri(),
+            ]);
+
+            // Fetch configure.tpl template
+            $output = $this->context->smarty->fetch($this->module->getLocalPath().'views/templates/admin/configure.tpl');
+            $this->context->smarty->assign('content', $output);
+        }
 
         // Return the output
         return $output;
     }
+
+
+    public function displayLogin()
+    {
+        // Assign Smarty variables if needed
+        $this->context->smarty->assign([
+            'module_dir' => $this->module->getPathUri(),
+        ]);
+
+        // Display the login page
+        $this->setTemplate('admin/login.tpl');
+    }
+
 
 }
