@@ -103,7 +103,7 @@ class ChannelEngine extends Module
 //        }
 
         $this->context->smarty->assign([
-            'content' => 'Hello World!',
+            'module_dir' => 'Channel Engine'
         ]);
 
         // Prikazivanje hello world (configure.tpl) stranice
@@ -122,5 +122,6 @@ class ChannelEngine extends Module
     {
         $this->context->controller->addJS($this->_path.'/views/js/front.js');
         $this->context->controller->addCSS($this->_path.'/views/css/front.css');
+        // $this->context->controller->addCSS($this->_path.'/views/css/welcome.css');
     }
 }

@@ -1,0 +1,40 @@
+.welcome-container {
+    text-align: center;
+    margin: 0 auto;
+    padding: 50px;
+    max-width: 600px;
+    border: 2px solid #000;
+    background-color: #fff;
+}
+
+.welcome-logo {
+    width: 100px;
+    margin-bottom: 20px;
+}
+
+.welcome-title {
+    font-size: 24px;
+    font-weight: bold;
+    color: #000;
+    margin-bottom: 20px;
+}
+
+.welcome-message {
+    font-size: 16px;
+    color: #555;
+    margin-bottom: 30px;
+}
+
+.welcome-button {
+    background-color: #007bff;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.welcome-button:hover {
+    background-color: #0056b3;
+}

@@ -1,3 +1,9 @@
-<div class="panel">
-    <h3>{$content}</h3>
+<link rel="stylesheet" type="text/css" href="{$module_dir}views/css/welcome.css">
+
+<div class="welcome-container">
+    <img src="{$module_dir}views/img/logo.png" alt="Channel Engine Logo" class="welcome-logo">
+    <h1 class="welcome-title">Welcome to ChannelEngine</h1>
+    <p class="welcome-message">Connect, sync product data to ChannelEngine and orders to your shop.</p>
+    <button class="welcome-button">Connect</button>
 </div>
+

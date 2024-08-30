@@ -14,14 +14,16 @@ class AdminChannelEngineController extends ModuleAdminController
 
         // Prikazivanje hello world (configure.tpl) stranice
         $this->context->smarty->assign([
-            'content' => 'Hello World!',
+            'module_dir' => $this->module->getPathUri(),  // Popravka module_dir
+            //'ps_version' => _PS_VERSION_,
         ]);
 
-        // Direktno prikazivanje šablona koristeći display metod
-        //$this->display(__FILE__, 'views/templates/admin/configure.tpl');
-
-        // Prikaz hello world stranice
+        // Fetch the content
         $output = $this->context->smarty->fetch($this->module->getLocalPath().'views/templates/admin/configure.tpl');
         $this->context->smarty->assign('content', $output);
+
+        // Return the output
+        return $output;
     }
+
 }
