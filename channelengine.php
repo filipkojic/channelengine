@@ -24,11 +24,13 @@
  *  International Registered Trademark & Property of PrestaShop SA
  */
 
+use PrestaShopBundle\Entity\Repository\TabRepository;
+
 if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-class Channelengine extends Module
+class ChannelEngine extends Module
 {
     protected $config_form = false;
 
@@ -47,8 +49,8 @@ class Channelengine extends Module
 
         parent::__construct();
 
-        $this->displayName = $this->l('channelengine');
-        $this->description = $this->l('FIlip\'s channel engine.');
+        $this->displayName = $this->l('Channel Engine');
+        $this->description = $this->l('Filip\'s Channel Engine.');
 
         $this->ps_versions_compliancy = array('min' => '8.1', 'max' => _PS_VERSION_);
     }
@@ -58,13 +60,15 @@ class Channelengine extends Module
         return parent::install() &&
             $this->registerHook('header') &&
             $this->registerHook('displayBackOfficeHeader') &&
-            $this->installTab('AdminParentModulesSf', 'AdminChannelEngine', 'ChannelEngine');
+            $this->installTab('AdminParentOrders', 'AdminChannelEngine', 'ChannelEngine');
     }
 
     private function installTab($parent, $class_name, $name)
     {
         $tab = new Tab();
-        $tab->id_parent = (int) Tab::getIdFromClassName($parent);
+        //$tab->id_parent = (int) Tab::getIdFromClassName($parent);
+        $tabRepository = $this->get('prestashop.core.admin.tab.repository');
+        $tab->id_parent = (int) $tabRepository->findOneIdByClassName('AdminParentOrders');
         $tab->class_name = $class_name;
         $tab->module = $this->name;
         $tab->active = 1;
@@ -84,7 +88,8 @@ class Channelengine extends Module
 
     private function uninstallTab($class_name)
     {
-        $id_tab = (int) Tab::getIdFromClassName($class_name);
+        $tabRepository = $this->get('prestashop.core.admin.tab.repository');
+        $id_tab = (int) $tabRepository->findOneIdByClassName('AdminParentOrders');
         if ($id_tab) {
             $tab = new Tab($id_tab);
             return $tab->delete();
@@ -97,6 +102,10 @@ class Channelengine extends Module
         if (Tools::isSubmit('submitChannelengineModule')) {
             $this->postProcess();
         }
+
+        $this->context->smarty->assign(array(
+            'content' => 'Hello World!',
+        ));
 
         // Prikazivanje hello world (configure.tpl) stranice
         return $this->display(__FILE__, 'views/templates/admin/configure.tpl');
