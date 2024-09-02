@@ -30,10 +30,23 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
+/**
+ * Class ChannelEngine
+ *
+ * This class represents the ChannelEngine module in PrestaShop. It handles the installation,
+ * uninstallation, and configuration of the module, as well as registering necessary hooks
+ * and managing the module's tab in the back office.
+ */
 class ChannelEngine extends Module
 {
     protected $config_form = false;
 
+    /**
+     * ChannelEngine constructor.
+     *
+     * Initializes the module with basic information such as name, tab, version, and author.
+     * It also sets the bootstrap to true to ensure compatibility with PrestaShop's bootstrap framework.
+     */
     public function __construct()
     {
         $this->name = 'channelengine';
@@ -42,10 +55,7 @@ class ChannelEngine extends Module
         $this->author = 'Filip Kojic';
         $this->need_instance = 0;
 
-        /**
-         * Set $this->bootstrap to true if your module is compliant with bootstrap (PrestaShop 1.6)
-         */
-        $this->bootstrap = true;
+        $this->bootstrap = true; // Ensure compatibility with bootstrap
 
         parent::__construct();
 
@@ -55,6 +65,14 @@ class ChannelEngine extends Module
         $this->ps_versions_compliancy = ['min' => '8.1', 'max' => _PS_VERSION_];
     }
 
+    /**
+     * Install the module.
+     *
+     * This method handles the installation of the module, including registering hooks and adding a tab
+     * to the back office.
+     *
+     * @return bool True if installation was successful, false otherwise.
+     */
     public function install()
     {
         return parent::install() &&
@@ -63,11 +81,21 @@ class ChannelEngine extends Module
             $this->installTab('AdminParentOrders', 'AdminChannelEngine', 'ChannelEngine');
     }
 
+    /**
+     * Install a tab in the back office.
+     *
+     * This method adds a new tab under a specified parent tab in the back office.
+     *
+     * @param string $parent The parent tab's class name.
+     * @param string $class_name The class name of the new tab.
+     * @param string $name The name of the new tab.
+     * @return bool True if the tab was added successfully, false otherwise.
+     */
     private function installTab($parent, $class_name, $name)
     {
         $tab = new Tab();
         $tabRepository = $this->get('prestashop.core.admin.tab.repository');
-        $tab->id_parent = (int) $tabRepository->findOneIdByClassName('AdminParentOrders');
+        $tab->id_parent = (int) $tabRepository->findOneIdByClassName($parent);
         $tab->class_name = $class_name;
         $tab->module = $this->name;
         $tab->active = 1;
@@ -79,12 +107,28 @@ class ChannelEngine extends Module
         return $tab->add();
     }
 
+    /**
+     * Uninstall the module.
+     *
+     * This method handles the uninstallation of the module, including removing the tab
+     * and any configuration values.
+     *
+     * @return bool True if uninstallation was successful, false otherwise.
+     */
     public function uninstall()
     {
         Configuration::deleteByName('CHANNELENGINE_LIVE_MODE');
         return parent::uninstall() && $this->uninstallTab('AdminChannelEngine');
     }
 
+    /**
+     * Uninstall a tab from the back office.
+     *
+     * This method removes a tab from the back office.
+     *
+     * @param string $class_name The class name of the tab to remove.
+     * @return bool True if the tab was removed successfully, false otherwise.
+     */
     private function uninstallTab($class_name)
     {
         $tabRepository = $this->get('prestashop.core.admin.tab.repository');
@@ -96,12 +140,26 @@ class ChannelEngine extends Module
         return false;
     }
 
+    /**
+     * Get content for the configuration page.
+     *
+     * This method redirects the user to the AdminChannelEngine controller for further configuration.
+     *
+     * @return void
+     */
     public function getContent()
     {
         $link = $this->context->link->getAdminLink('AdminChannelEngine');
         Tools::redirectAdmin($link);
     }
 
+    /**
+     * Hook for displaying content in the back office header.
+     *
+     * This method loads specific CSS and JS files when the module's configuration page is accessed.
+     *
+     * @return void
+     */
     public function hookDisplayBackOfficeHeader()
     {
         if (Tools::getValue('configure') == $this->name) {
@@ -110,6 +168,13 @@ class ChannelEngine extends Module
         }
     }
 
+    /**
+     * Hook for displaying content in the front office header.
+     *
+     * This method loads specific CSS and JS files on the front end when needed.
+     *
+     * @return void
+     */
     public function hookHeader()
     {
         $this->context->controller->addJS($this->_path.'/views/js/front.js');
