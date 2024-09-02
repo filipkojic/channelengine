@@ -21,6 +21,9 @@ class AdminChannelEngineController extends ModuleAdminController
 
     protected function defaultAction()
     {
+        $this->context->controller->addCSS($this->module->getPathUri() . 'views/css/welcome.css');
+        $this->context->controller->addJS($this->module->getPathUri() . 'views/js/welcome.js');
+
         $this->context->smarty->assign([
             'module_dir' => $this->module->getPathUri(),
         ]);

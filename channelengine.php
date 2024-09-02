@@ -98,18 +98,21 @@ class ChannelEngine extends Module
 
     public function getContent()
     {
-        if (isset($this->context->link)) {
-            $link = $this->context->link;
-        } else {
-            $link = new Link();
-        }
+//        if (isset($this->context->link)) {
+//            $link = $this->context->link;
+//        } else {
+//            $link = new Link();
+//        }
+//
+//        $this->context->smarty->assign([
+//            'module_dir' => $this->getPathUri(),
+//            'link' => $link,
+//        ]);
+//
+//        return $this->display(__FILE__, 'views/templates/admin/configure.tpl');
 
-        $this->context->smarty->assign([
-            'module_dir' => $this->getPathUri(),
-            'link' => $link,
-        ]);
-
-        return $this->display(__FILE__, 'views/templates/admin/configure.tpl');
+        $link = $this->context->link->getAdminLink('AdminChannelEngine');
+        Tools::redirectAdmin($link);
     }
 
     public function hookDisplayBackOfficeHeader()
