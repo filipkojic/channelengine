@@ -80,53 +80,47 @@ class AdminChannelEngineController extends ModuleAdminController
         $this->context->smarty->assign('content', $output);
     }
 
-//    protected function loginAction()
-//    {
-//        // Uzimanje vrednosti iz POST zahteva
-//        $accountName = Tools::getValue('account_name');
-//        $apiKey = Tools::getValue('api_key');
-//
-//        // Validacija unosa
-//        if (empty($accountName) || empty($apiKey)) {
-//            $this->context->smarty->assign([
-//                'error' => 'Both fields are required.'
-//            ]);
-//            $this->displayLogin(); // Prikazivanje login stranice sa greškom
-//            return;
-//        }
-//
-//        // Povezivanje sa ChannelEngine API-jem
-//        $url = 'https://api.channelengine.net/api/v2/auth';
-//        $data = [
-//            'account_name' => $accountName,
-//            'api_key' => $apiKey
-//        ];
-//
-//        // Izvršenje zahteva
-//        $ch = curl_init();
-//        curl_setopt($ch, CURLOPT_URL, $url);
-//        curl_setopt($ch, CURLOPT_POST, 1);
-//        curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
-//        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-//        $response = curl_exec($ch);
-//        curl_close($ch);
-//
-//        // Dekodiranje odgovora
-//        $responseData = json_decode($response, true);
-//
-//        if (isset($responseData['success']) && $responseData['success'] === true) {
-//            // Prijava je uspešna, sačuvajte podatke
-//            Configuration::updateValue('CHANNELENGINE_ACCOUNT_NAME', $accountName);
-//            Configuration::updateValue('CHANNELENGINE_API_KEY', $apiKey);
-//
-//            Tools::redirectAdmin($this->context->link->getAdminLink('AdminChannelEngine'));
-//        } else {
-//            // Prijava nije uspela, prikažite grešku
-//            $this->context->smarty->assign([
-//                'error' => 'Login failed. Please check your credentials.'
-//            ]);
-//            $this->displayLogin(); // Prikazivanje login stranice sa greškom
-//        }
-//    }
+    public function handleLogin()
+    {
+        $apiKey = Tools::getValue('api_key');
+        $accountName = Tools::getValue('account_name');
+
+        $url = 'https://logeecom-1-dev.channelengine.net/api/v2/settings?apikey=' . $apiKey;
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_HTTPGET, 1);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, ['accept: application/json']);
+
+        $response = curl_exec($ch);
+        curl_close($ch);
+
+        $responseData = json_decode($response, true);
+
+        if ($responseData['StatusCode'] == 200 && $responseData['Success'] === true) {
+            Configuration::updateValue('CHANNELENGINE_ACCOUNT_NAME', $accountName);
+            Configuration::updateValue('CHANNELENGINE_API_KEY', $apiKey);
+
+            Tools::redirectAdmin($this->context->link->getAdminLink('AdminChannelEngine') . '&action=displaySync');
+        } else {
+            $this->context->smarty->assign([
+                'error' => 'Login failed. Please check your credentials.'
+            ]);
+            $this->displayLogin();
+        }
+
+    }
+
+    protected function displaySync()
+    {
+        $this->context->smarty->assign([
+            'module_dir' => $this->module->getPathUri(),
+        ]);
+
+        $output = $this->context->smarty->fetch($this->module->getLocalPath() . 'views/templates/admin/sync.tpl');
+        $this->context->smarty->assign('content', $output);
+    }
+
 
 }

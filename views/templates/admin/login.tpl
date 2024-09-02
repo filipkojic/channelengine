@@ -11,15 +11,17 @@
     {/if}
 
     <p class="login-message">Please enter account data:</p>
-    <form method="post" action="{$link->getAdminLink('AdminChannelEngine')}&action=loginAction">
+    <form id="login-form" method="post" action="{$link->getAdminLink('AdminChannelEngine')}&action=handleLogin">
         <div class="form-group">
             <label for="account_name">Account name</label>
-            <input type="text" name="account_name" id="account_name" required>
+            <input type="text" name="account_name" id="account_name">
         </div>
         <div class="form-group">
             <label for="api_key">Api key</label>
-            <input type="text" name="api_key" id="api_key" required>
+            <input type="text" name="api_key" id="api_key">
         </div>
         <button type="submit" class="login-button">Connect</button>
     </form>
 </div>
+
+<script src="{$module_dir}views/js/login.js"></script>
