@@ -102,9 +102,19 @@ class ChannelEngine extends Module
 //            $this->postProcess();
 //        }
 
+        // Provera da li je $this->context->link setovan
+        if (isset($this->context->link)) {
+            $link = $this->context->link;
+        } else {
+            // Ako nije, generiši novi Link objekat
+            $link = new Link();
+        }
+
         $this->context->smarty->assign([
-            'module_dir' => 'Channel Engine'
+            'module_dir' => $this->getPathUri(),
+            'link' => $link,
         ]);
+
 
         // Prikazivanje hello world (configure.tpl) stranice
         return $this->display(__FILE__, 'views/templates/admin/configure.tpl');
