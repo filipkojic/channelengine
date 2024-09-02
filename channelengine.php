@@ -98,15 +98,9 @@ class ChannelEngine extends Module
 
     public function getContent()
     {
-//        if (Tools::isSubmit('submitChannelengineModule')) {
-//            $this->postProcess();
-//        }
-
-        // Provera da li je $this->context->link setovan
         if (isset($this->context->link)) {
             $link = $this->context->link;
         } else {
-            // Ako nije, generiši novi Link objekat
             $link = new Link();
         }
 
@@ -115,8 +109,6 @@ class ChannelEngine extends Module
             'link' => $link,
         ]);
 
-
-        // Prikazivanje hello world (configure.tpl) stranice
         return $this->display(__FILE__, 'views/templates/admin/configure.tpl');
     }
 
@@ -132,6 +124,5 @@ class ChannelEngine extends Module
     {
         $this->context->controller->addJS($this->_path.'/views/js/front.js');
         $this->context->controller->addCSS($this->_path.'/views/css/front.css');
-        // $this->context->controller->addCSS($this->_path.'/views/css/welcome.css');
     }
 }
