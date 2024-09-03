@@ -132,13 +132,14 @@ class ChannelEngine extends Module
     private function uninstallTab($class_name)
     {
         $tabRepository = $this->get('prestashop.core.admin.tab.repository');
-        $id_tab = (int) $tabRepository->findOneIdByClassName('AdminParentOrders');
+        $id_tab = (int) $tabRepository->findOneIdByClassName($class_name);
         if ($id_tab) {
             $tab = new Tab($id_tab);
             return $tab->delete();
         }
         return false;
     }
+
 
     /**
      * Get content for the configuration page.
