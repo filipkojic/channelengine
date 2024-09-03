@@ -12,7 +12,7 @@
 </div>
 
 <script>
-    document.getElementById('sync-button').addEventListener('click', function() {
-        window.location.href = '{$link->getAdminLink('AdminChannelEngine')}&action=startSync';
-    });
+    let admin_link = '{$link->getAdminLink('AdminChannelEngine')}';
 </script>
+
+<script src="{$module_dir}views/js/sync.js"></script>

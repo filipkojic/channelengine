@@ -122,5 +122,12 @@ class AdminChannelEngineController extends ModuleAdminController
         $this->context->smarty->assign('content', $output);
     }
 
+    protected function startSync()
+    {
+        $a = 3;
+        $b = 5;
+        $c = $a + $b;
+    }
+
 
 }
