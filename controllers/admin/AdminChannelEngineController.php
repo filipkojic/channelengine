@@ -99,8 +99,10 @@ class AdminChannelEngineController extends ModuleAdminController
         $responseData = json_decode($response, true);
 
         if ($responseData['StatusCode'] == 200 && $responseData['Success'] === true) {
-            Configuration::updateValue('CHANNELENGINE_ACCOUNT_NAME', $accountName);
-            Configuration::updateValue('CHANNELENGINE_API_KEY', $apiKey);
+            $sql = 'INSERT INTO ' . _DB_PREFIX_ . 'channelengine_credentials (account_name, api_key, date_add)
+            VALUES ("' . pSQL($accountName) . '", "' . pSQL($apiKey) . '", NOW())';
+
+            Db::getInstance()->execute($sql);
 
             Tools::redirectAdmin($this->context->link->getAdminLink('AdminChannelEngine') . '&action=displaySync');
         } else {
