@@ -10,8 +10,10 @@
   },
   "autoload": {
     "psr-4": {
-      "ChannelEngine\\PrestaShop\\Services\\": "classes/Services/",
-      "ChannelEngine\\PrestaShop\\Repositories\\": "classes/Repositories/"
+      "ChannelEngine\\PrestaShop\\Classes\\": "classes"
     }
+  },
+  "config": {
+    "prepend-autoloader": false
   }
 }
