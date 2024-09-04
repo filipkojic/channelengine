@@ -1,2 +1,17 @@
 {
+  "name": "filip/channelengine",
+  "description": "Channel Engine PrestaShop module",
+  "type": "library",
+  "version": "1.0.0",
+  "require": {
+    "php": ">=7.2",
+    "ext-json": "*",
+    "ext-curl": "*"
+  },
+  "autoload": {
+    "psr-4": {
+      "ChannelEngine\\PrestaShop\\Services\\": "classes/Services/",
+      "ChannelEngine\\PrestaShop\\Repositories\\": "classes/Repositories/"
+    }
+  }
 }
