@@ -80,7 +80,20 @@ class ChannelEngine extends Module
         return parent::install() &&
             $this->registerHook('header') &&
             $this->registerHook('displayBackOfficeHeader') &&
-            $this->installTab('AdminParentOrders', 'AdminChannelEngine', 'ChannelEngine');
+            $this->installTab('AdminParentOrders', 'AdminChannelEngine', 'ChannelEngine')
+            && $this->createCredentialsTable();
+    }
+
+    private function createCredentialsTable()
+    {
+        $sql = 'CREATE TABLE IF NOT EXISTS ' . _DB_PREFIX_ . 'channelengine_credentials (
+                id INT(11) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+                account_name VARCHAR(255) NOT NULL,
+                api_key VARCHAR(255) NOT NULL,
+                date_add DATETIME NOT NULL
+            ) ENGINE=' . _MYSQL_ENGINE_ . ' DEFAULT CHARSET=utf8;';
+
+        return Db::getInstance()->execute($sql);
     }
 
     /**
@@ -120,7 +133,14 @@ class ChannelEngine extends Module
     public function uninstall()
     {
         Configuration::deleteByName('CHANNELENGINE_LIVE_MODE');
-        return parent::uninstall() && $this->uninstallTab('AdminChannelEngine');
+        return parent::uninstall() && $this->uninstallTab('AdminChannelEngine')
+             && $this->dropCredentialsTable();
+    }
+
+    private function dropCredentialsTable()
+    {
+        $sql = 'DROP TABLE IF EXISTS ' . _DB_PREFIX_ . 'channelengine_credentials';
+        return Db::getInstance()->execute($sql);
     }
 
     /**
