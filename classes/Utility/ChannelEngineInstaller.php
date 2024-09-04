@@ -28,7 +28,6 @@ class ChannelEngineInstaller
     public function install()
     {
         return $this->createCredentialsTable() &&
-            $this->registerHooks() &&
             $this->addMenuItem();
     }
 
@@ -62,15 +61,6 @@ class ChannelEngineInstaller
     {
         $sql = 'DROP TABLE IF EXISTS ' . _DB_PREFIX_ . 'channelengine_credentials';
         return Db::getInstance()->execute($sql);
-    }
-
-    /**
-     * Registers necessary hooks for the module.
-     */
-    private function registerHooks()
-    {
-        return $this->module->registerHook('header') &&
-            $this->module->registerHook('displayBackOfficeHeader');
     }
 
     /**
