@@ -126,68 +126,86 @@ class AdminChannelEngineController extends ModuleAdminController
 
     public function startSync()
     {
-//        $id_lang = (int)$this->context->language->id; // ID jezika iz konteksta
-//
-//        // Dobavljanje liste proizvoda
-//        $allProducts = Product::getProducts($id_lang, 0, 0, 'id_product', 'ASC');
-//
-//        // Formiranje podataka u formatu koji zahteva ChannelEngine API
-//        $products = [];
-//        foreach ($allProducts as $productData) {
-//            $product = [
-//                'MerchantProductNo' => $productData['id_product'] + 5, // Unique identifier in PrestaShop
-//                'Name' => $productData['name'],
-//                'Description' => isset($productData['description']) ? $productData['description'] : '',
-//                'Price' => (float) $productData['price'],
-//            ];
-//
-//            $products[] = $product;
-//        }
-//
-//        // Priprema API zahteva za ChannelEngine
-//        $apiKey = Configuration::get('CHANNELENGINE_API_KEY'); // Dobavljaš API ključ iz konfiguracije
-//        $apiUrl = 'https://logeecom-1-dev.channelengine.net/api/v2/products?apikey=' . $apiKey;
-//
-//        // Kreiranje cURL zahteva
-//        $ch = curl_init($apiUrl);
-//        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-//        curl_setopt($ch, CURLOPT_POST, true);
-//
-//        // Header koji definiše da se šalje JSON
-//        curl_setopt($ch, CURLOPT_HTTPHEADER, [
-//            'Content-Type: application/json',
-//        ]);
-//
-//        // Slanje podataka u JSON formatu
-//        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($products));
-//
-//        // Izvršenje zahteva
-//        $response = curl_exec($ch);
-//        curl_close($ch);
-//
-//        // Procesiranje odgovora
-//        $responseData = json_decode($response, true);
-//
-//        if (isset($responseData['Success']) && $responseData['Success'] === true) {
-//            // Sinhronizacija uspešna
-//            echo 'Synchronization successful!';
-//        } else {
-//            // Obradi grešku
-//            echo 'Synchronization failed: ';
-//            print_r($responseData);
-//        }
+        try {
+            $id_lang = (int)$this->context->language->id; // ID jezika iz konteksta
 
+            // Dobavljanje liste proizvoda
+            $allProducts = Product::getProducts($id_lang, 0, 0, 'id_product', 'ASC');
 
-        $response = [
-            'success' => true,
-            'message' => 'Synchronization successful!',
-        ];
+            // Formiranje podataka u formatu koji zahteva ChannelEngine API
+            $products = [];
+            foreach ($allProducts as $productData) {
+                $product = [
+                    'MerchantProductNo' => $productData['id_product'] + 200, // Unique identifier in PrestaShop
+                    'Name' => $productData['name'],
+                    'Description' => $productData['description'] ?? '',
+                    'Price' => (float)$productData['price'],
+                ];
 
-        // Slanje JSON odgovora
-        header('Content-Type: application/json');
-        echo json_encode($response);
+                $products[] = $product;
+            }
+
+            // Priprema API zahteva za ChannelEngine
+            $apiKey = Configuration::get('CHANNELENGINE_API_KEY'); // Dobavljaš API ključ iz konfiguracije
+            $apiUrl = 'https://logeecom-1-dev.channelengine.net/api/v2/products?apikey=' . $apiKey;
+
+            // Kreiranje cURL zahteva
+            $ch = curl_init($apiUrl);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_POST, true);
+
+            // Header koji definiše da se šalje JSON
+            curl_setopt($ch, CURLOPT_HTTPHEADER, [
+                'Content-Type: application/json',
+            ]);
+
+            // Slanje podataka u JSON formatu
+            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($products));
+
+            // Izvršenje zahteva
+            $response = curl_exec($ch);
+
+            // Proveri da li je bilo greške prilikom cURL zahteva
+            if (curl_errno($ch)) {
+                throw new Exception('cURL error: ' . curl_error($ch));
+            }
+
+            curl_close($ch);
+
+            // Procesiranje odgovora
+            $responseData = json_decode($response, true);
+
+            // Provera uspeha zahteva prema API-ju
+            if (isset($responseData['Success']) && $responseData['Success'] === true) {
+                $this->sendJsonResponse(true, 'Synchronization successful!');
+            } else {
+                $errorMessage = $responseData['Message'] ?? 'Unknown error occurred';
+                $this->sendJsonResponse(false, 'Synchronization failed: ' . $errorMessage);
+            }
+        } catch (Exception $e) {
+            $this->sendJsonResponse(false, 'An error occurred: ' . $e->getMessage());
+        }
+
         exit;
     }
+
+    /**
+     * Helper funkcija za slanje JSON odgovora.
+     *
+     * @param bool $success
+     * @param string $message
+     */
+    private function sendJsonResponse(bool $success, string $message)
+    {
+        $response = [
+            'success' => $success,
+            'message' => $message,
+        ];
+
+        header('Content-Type: application/json');
+        echo json_encode($response);
+    }
+
 
 
 
