@@ -3,6 +3,7 @@
 namespace ChannelEngine\PrestaShop\Classes\Business\Services;
 
 use ChannelEngine\PrestaShop\Classes\Business\Interfaces\ProxyInterfaces\ChannelEngineProxyInterface;
+use ChannelEngine\PrestaShop\Classes\Business\Interfaces\RepositoryInterfaces\ProductRepositoryInterface;
 use ChannelEngine\PrestaShop\Classes\Business\Interfaces\ServiceInterfaces\SyncServiceInterface;
 use ChannelEngine\PrestaShop\Classes\Proxy\ChannelEngineProxy;
 use Product;
@@ -10,10 +11,12 @@ use Product;
 class SyncService implements SyncServiceInterface
 {
     protected $channelEngineProxy;
+    protected $productRepository;
 
-    public function __construct(ChannelEngineProxyInterface $proxy)
+    public function __construct(ChannelEngineProxyInterface $proxy, ProductRepositoryInterface $productRepository)
     {
         $this->channelEngineProxy = $proxy;
+        $this->productRepository = $productRepository;
     }
 
     /**
@@ -23,15 +26,18 @@ class SyncService implements SyncServiceInterface
      * @return bool|array
      * @throws \Exception
      */
-    public function startSync(array $products)
+    public function startSync(int $langId): bool
     {
-        $response = $this->channelEngineProxy->syncProducts($products);
+        // Dobavljanje proizvoda iz repozitorijuma
+        $products = $this->productRepository->getProductsByLang($langId);
 
-        if ($response === true) {
-            return true;
-        }
+        // Pretvaranje proizvoda u asocijativni niz za API
+        $formattedProducts = array_map(function($product) {
+            return $product->toArray();
+        }, $products);
 
-        return $response;
+        // Slanje proizvoda ka proxy-ju
+        return $this->channelEngineProxy->syncProducts($formattedProducts);
     }
 
     /**

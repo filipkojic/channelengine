@@ -11,7 +11,7 @@ interface SyncServiceInterface
      * @return bool|array
      * @throws \Exception
      */
-    public function startSync(array $products);
+    public function startSync(int $langId);
 
     /**
      * Preuzima i formatira proizvode iz PrestaShop baze.

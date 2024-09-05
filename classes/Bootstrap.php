@@ -3,8 +3,10 @@
 namespace ChannelEngine\PrestaShop\Classes;
 
 use ChannelEngine\PrestaShop\Classes\Business\Interfaces\ProxyInterfaces\ChannelEngineProxyInterface;
+use ChannelEngine\PrestaShop\Classes\Business\Interfaces\RepositoryInterfaces\ProductRepositoryInterface;
 use ChannelEngine\PrestaShop\Classes\Business\Interfaces\ServiceInterfaces\LoginServiceInterface;
 use ChannelEngine\PrestaShop\Classes\Business\Interfaces\ServiceInterfaces\SyncServiceInterface;
+use ChannelEngine\PrestaShop\Classes\Business\Persistence\Repositories\ProductRepository;
 use ChannelEngine\PrestaShop\Classes\Business\Services\LoginService;
 use ChannelEngine\PrestaShop\Classes\Business\Services\SyncService;
 use ChannelEngine\PrestaShop\Classes\Proxy\ChannelEngineProxy;
@@ -45,8 +47,7 @@ class Bootstrap
      */
     protected static function registerRepos(): void
     {
-        //ServiceRegistry::getInstance()->register(ProductRepositoryInterface::class, new ProductRepository());
-        //ServiceRegistry::getInstance()->register(CategoryRepositoryInterface::class, new CategoryRepository());
+        ServiceRegistry::getInstance()->register(ProductRepositoryInterface::class, new ProductRepository());
     }
 
     /**
@@ -62,7 +63,8 @@ class Bootstrap
         ));
 
         ServiceRegistry::getInstance()->register(SyncServiceInterface::class, new SyncService(
-            ServiceRegistry::getInstance()->get(ChannelEngineProxyInterface::class)
+            ServiceRegistry::getInstance()->get(ChannelEngineProxyInterface::class),
+            ServiceRegistry::getInstance()->get(ProductRepositoryInterface::class)
         ));
     }
 }

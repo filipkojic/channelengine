@@ -38,17 +38,14 @@ class AdminSyncController extends ModuleAdminController
         $id_lang = (int)$this->context->language->id;
 
         try {
-            // Preuzimanje i formatiranje proizvoda iz servisa
-            $products = ServiceRegistry::getInstance()->get(SyncServiceInterface::class)->getFormattedProducts($id_lang);
-
-            // Pokretanje sinhronizacije putem servisa
-            $response = ServiceRegistry::getInstance()->get(SyncServiceInterface::class)->startSync($products);
+            // Pokreni sinhronizaciju putem servisa
+            $syncService = ServiceRegistry::getInstance()->get(SyncServiceInterface::class);
+            $response = $syncService->startSync($id_lang);
 
             if ($response === true) {
                 $this->sendJsonResponse(true, 'Synchronization successful!');
             } else {
-                $errorMessage = $response['Message'] ?? 'Unknown error occurred';
-                $this->sendJsonResponse(false, 'Synchronization failed: ' . $errorMessage);
+                $this->sendJsonResponse(false, 'Synchronization failed: Unknown error occurred');
             }
         } catch (Exception $e) {
             $this->sendJsonResponse(false, 'An error occurred: ' . $e->getMessage());
