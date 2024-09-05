@@ -1,5 +1,7 @@
 <?php
 
+use ChannelEngine\PrestaShop\Classes\Business\Services\LoginService;
+use ChannelEngine\PrestaShop\Classes\Business\Services\SyncService;
 use ChannelEngine\PrestaShop\Classes\Proxy\ChannelEngineProxy;
 
 /**
@@ -11,6 +13,9 @@ use ChannelEngine\PrestaShop\Classes\Proxy\ChannelEngineProxy;
  */
 class AdminChannelEngineController extends ModuleAdminController
 {
+
+    protected $loginService;
+    protected $syncService;
     /**
      * Constructor
      *
@@ -20,6 +25,9 @@ class AdminChannelEngineController extends ModuleAdminController
     {
         $this->bootstrap = true;
         parent::__construct();
+
+        $this->loginService = new LoginService();
+        $this->syncService = new SyncService();
 
     }
 
@@ -51,14 +59,14 @@ class AdminChannelEngineController extends ModuleAdminController
     protected function defaultAction()
     {
 
-        $apiKey = Configuration::get('CHANNELENGINE_API_KEY');
+        /*$apiKey = Configuration::get('CHANNELENGINE_API_KEY');
         $accountName = Configuration::get('CHANNELENGINE_ACCOUNT_NAME');
 
         // Ako su parametri postavljeni, odmah pozivamo stranicu za sinhronizaciju
         if ($apiKey && $accountName) {
             $this->displaySync();
             return; // Zaustavljamo dalje izvršavanje kako bismo prikazali stranicu za sinhronizaciju
-        }
+        }*/
 
         // Add CSS and JS for the welcome page
         $this->context->controller->addCSS($this->module->getPathUri() . 'views/css/welcome.css');
@@ -93,32 +101,6 @@ class AdminChannelEngineController extends ModuleAdminController
         $this->context->smarty->assign('content', $output);
     }
 
-    public function handleLogin()
-    {
-        $apiKey = Tools::getValue('api_key');
-        $accountName = Tools::getValue('account_name');
-
-        $channelEngineProxy = new ChannelEngineProxy();
-
-        try {
-            // Validacija kredencijala putem proxy-ja
-            $responseData = $channelEngineProxy->validateCredentials($apiKey);
-
-            // Ako je validacija uspešna, čuvamo API ključ i naziv naloga u PrestaShop konfiguraciji
-            Configuration::updateValue('CHANNELENGINE_ACCOUNT_NAME', $accountName);
-            Configuration::updateValue('CHANNELENGINE_API_KEY', $apiKey);
-
-            // Redirekcija na sinhronizaciju
-            Tools::redirectAdmin($this->context->link->getAdminLink('AdminChannelEngine') . '&action=displaySync');
-        } catch (Exception $e) {
-            // U slučaju greške, prikazujemo poruku o grešci na login stranici
-            $this->context->smarty->assign([
-                'error' => 'Login failed. Please check your credentials: '
-            ]);
-            $this->displayLogin();
-        }
-    }
-
     protected function displaySync()
     {
         $this->context->smarty->assign([
@@ -129,34 +111,39 @@ class AdminChannelEngineController extends ModuleAdminController
         $this->context->smarty->assign('content', $output);
     }
 
+    public function handleLogin()
+    {
+        $apiKey = Tools::getValue('api_key');
+        $accountName = Tools::getValue('account_name');
+
+        try {
+            if ($this->loginService->handleLogin($apiKey, $accountName)) {
+                Tools::redirectAdmin($this->context->link->getAdminLink('AdminChannelEngine') . '&action=displaySync');
+            } else {
+                $this->context->smarty->assign([
+                    'error' => 'Login failed. Please check your credentials.'
+                ]);
+                $this->displayLogin();
+            }
+        } catch (Exception $e) {
+            $this->context->smarty->assign([
+                'error' => 'Login failed.'
+            ]);
+            $this->displayLogin();
+        }
+    }
+
     public function startSync()
     {
+        $id_lang = (int)$this->context->language->id;
+
         try {
-            $id_lang = (int)$this->context->language->id; // ID jezika iz konteksta
+            // Preuzimanje i formatiranje proizvoda iz servisa
+            $products = $this->syncService->getFormattedProducts($id_lang);
 
-            // Dobavljanje liste proizvoda
-            $allProducts = Product::getProducts($id_lang, 0, 0, 'id_product', 'ASC');
+            // Pokretanje sinhronizacije putem servisa
+            $response = $this->syncService->startSync($products);
 
-            // Formiranje podataka u formatu koji zahteva ChannelEngine API
-            $products = [];
-            foreach ($allProducts as $productData) {
-                $product = [
-                    'MerchantProductNo' => $productData['id_product'], // Unique identifier in PrestaShop
-                    'Name' => $productData['name'],
-                    'Description' => $productData['description'] ?? '',
-                    'Price' => (float)$productData['price'],
-                ];
-
-                $products[] = $product;
-            }
-
-            // Inicijalizacija ChannelEngineProxy-a
-            $channelEngineProxy = new ChannelEngineProxy();
-
-            // Slanje proizvoda putem proxy-ja
-            $response = $channelEngineProxy->syncProducts($products);
-
-            // Provera uspeha zahteva prema API-ju
             if ($response === true) {
                 $this->sendJsonResponse(true, 'Synchronization successful!');
             } else {
@@ -167,6 +154,7 @@ class AdminChannelEngineController extends ModuleAdminController
             $this->sendJsonResponse(false, 'An error occurred: ' . $e->getMessage());
         }
     }
+
 
     /**
      * Helper funkcija za slanje JSON odgovora.
