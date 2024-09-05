@@ -50,6 +50,16 @@ class AdminChannelEngineController extends ModuleAdminController
      */
     protected function defaultAction()
     {
+
+        $apiKey = Configuration::get('CHANNELENGINE_API_KEY');
+        $accountName = Configuration::get('CHANNELENGINE_ACCOUNT_NAME');
+
+        // Ako su parametri postavljeni, odmah pozivamo stranicu za sinhronizaciju
+        if ($apiKey && $accountName) {
+            $this->displaySync();
+            return; // Zaustavljamo dalje izvršavanje kako bismo prikazali stranicu za sinhronizaciju
+        }
+
         // Add CSS and JS for the welcome page
         $this->context->controller->addCSS($this->module->getPathUri() . 'views/css/welcome.css');
         $this->context->controller->addJS($this->module->getPathUri() . 'views/js/welcome.js');
