@@ -136,7 +136,7 @@ class AdminChannelEngineController extends ModuleAdminController
             $products = [];
             foreach ($allProducts as $productData) {
                 $product = [
-                    'MerchantProductNo' => $productData['id_product'] + 200, // Unique identifier in PrestaShop
+                    'MerchantProductNo' => $productData['id_product'], // Unique identifier in PrestaShop
                     'Name' => $productData['name'],
                     'Description' => $productData['description'] ?? '',
                     'Price' => (float)$productData['price'],
