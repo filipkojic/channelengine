@@ -1,6 +1,6 @@
 <?php
 
-namespace ChannelEngine\PrestaShop\Classes\Repositories;
+namespace ChannelEngine\PrestaShop\Classes\Proxy;
 
 use ChannelEngine\PrestaShop\Classes\Utility\HttpClient;
 

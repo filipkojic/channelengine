@@ -18,6 +18,7 @@ class AdminChannelEngineController extends ModuleAdminController
     {
         $this->bootstrap = true;
         parent::__construct();
+
     }
 
     /**
