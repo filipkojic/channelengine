@@ -10,7 +10,7 @@
 </div>
 
 <script>
-    let admin_link = '{$link->getAdminLink('AdminChannelEngine')}';
+    let admin_link = '{$link->getAdminLink('AdminSync')}';
 </script>
 
 <script src="{$module_dir}views/js/sync.js"></script>

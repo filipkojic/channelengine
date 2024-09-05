@@ -2,7 +2,6 @@
 
 use ChannelEngine\PrestaShop\Classes\Business\Services\LoginService;
 use ChannelEngine\PrestaShop\Classes\Business\Services\SyncService;
-use ChannelEngine\PrestaShop\Classes\Proxy\ChannelEngineProxy;
 
 /**
  * AdminChannelEngineController class
@@ -131,47 +130,6 @@ class AdminChannelEngineController extends ModuleAdminController
             ]);
             $this->displayLogin();
         }
-    }
-
-    public function startSync()
-    {
-        $id_lang = (int)$this->context->language->id;
-
-        try {
-            // Preuzimanje i formatiranje proizvoda iz servisa
-            $products = $this->syncService->getFormattedProducts($id_lang);
-
-            // Pokretanje sinhronizacije putem servisa
-            $response = $this->syncService->startSync($products);
-
-            if ($response === true) {
-                $this->sendJsonResponse(true, 'Synchronization successful!');
-            } else {
-                $errorMessage = $response['Message'] ?? 'Unknown error occurred';
-                $this->sendJsonResponse(false, 'Synchronization failed: ' . $errorMessage);
-            }
-        } catch (Exception $e) {
-            $this->sendJsonResponse(false, 'An error occurred: ' . $e->getMessage());
-        }
-    }
-
-
-    /**
-     * Helper funkcija za slanje JSON odgovora.
-     *
-     * @param bool $success
-     * @param string $message
-     */
-    private function sendJsonResponse(bool $success, string $message)
-    {
-        $response = [
-            'success' => $success,
-            'message' => $message,
-        ];
-
-        header('Content-Type: application/json');
-        echo json_encode($response);
-        exit;
     }
 
 }
