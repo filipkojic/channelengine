@@ -1,7 +1,9 @@
 <?php
 
+use ChannelEngine\PrestaShop\Classes\Business\Interfaces\ServiceInterfaces\LoginServiceInterface;
 use ChannelEngine\PrestaShop\Classes\Business\Services\LoginService;
 use ChannelEngine\PrestaShop\Classes\Business\Services\SyncService;
+use ChannelEngine\PrestaShop\Classes\Utility\ServiceRegistry;
 
 /**
  * AdminChannelEngineController class
@@ -12,9 +14,6 @@ use ChannelEngine\PrestaShop\Classes\Business\Services\SyncService;
  */
 class AdminChannelEngineController extends ModuleAdminController
 {
-
-    protected $loginService;
-    protected $syncService;
     /**
      * Constructor
      *
@@ -24,10 +23,6 @@ class AdminChannelEngineController extends ModuleAdminController
     {
         $this->bootstrap = true;
         parent::__construct();
-
-        $this->loginService = new LoginService();
-        $this->syncService = new SyncService();
-
     }
 
     /**
@@ -116,7 +111,7 @@ class AdminChannelEngineController extends ModuleAdminController
         $accountName = Tools::getValue('account_name');
 
         try {
-            if ($this->loginService->handleLogin($apiKey, $accountName)) {
+            if (ServiceRegistry::getInstance()->get(LoginServiceInterface::class)->handleLogin($apiKey, $accountName)) {
                 Tools::redirectAdmin($this->context->link->getAdminLink('AdminChannelEngine') . '&action=displaySync');
             } else {
                 $this->context->smarty->assign([

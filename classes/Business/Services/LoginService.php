@@ -2,6 +2,7 @@
 
 namespace ChannelEngine\PrestaShop\Classes\Business\Services;
 
+use ChannelEngine\PrestaShop\Classes\Business\Interfaces\ProxyInterfaces\ChannelEngineProxyInterface;
 use ChannelEngine\PrestaShop\Classes\Business\Interfaces\ServiceInterfaces\LoginServiceInterface;
 use ChannelEngine\PrestaShop\Classes\Proxy\ChannelEngineProxy;
 use Configuration;
@@ -10,9 +11,9 @@ class LoginService implements LoginServiceInterface
 {
     protected $channelEngineProxy;
 
-    public function __construct()
+    public function __construct(ChannelEngineProxyInterface $proxy)
     {
-        $this->channelEngineProxy = new ChannelEngineProxy();
+        $this->channelEngineProxy = $proxy;
     }
 
     /**

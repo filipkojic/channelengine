@@ -1,18 +1,15 @@
 <?php
 
+use ChannelEngine\PrestaShop\Classes\Business\Interfaces\ServiceInterfaces\SyncServiceInterface;
 use ChannelEngine\PrestaShop\Classes\Business\Services\SyncService;
+use ChannelEngine\PrestaShop\Classes\Utility\ServiceRegistry;
 
 class AdminSyncController extends ModuleAdminController
 {
-    protected $syncService;
-
     public function __construct()
     {
         $this->bootstrap = true;
         parent::__construct();
-
-        // Inicijalizacija SyncService
-        $this->syncService = new SyncService();
     }
 
     /**
@@ -42,10 +39,10 @@ class AdminSyncController extends ModuleAdminController
 
         try {
             // Preuzimanje i formatiranje proizvoda iz servisa
-            $products = $this->syncService->getFormattedProducts($id_lang);
+            $products = ServiceRegistry::getInstance()->get(SyncServiceInterface::class)->getFormattedProducts($id_lang);
 
             // Pokretanje sinhronizacije putem servisa
-            $response = $this->syncService->startSync($products);
+            $response = ServiceRegistry::getInstance()->get(SyncServiceInterface::class)->startSync($products);
 
             if ($response === true) {
                 $this->sendJsonResponse(true, 'Synchronization successful!');

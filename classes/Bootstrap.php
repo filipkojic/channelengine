@@ -2,25 +2,41 @@
 
 namespace ChannelEngine\PrestaShop\Classes;
 
-use \Exception;
+use ChannelEngine\PrestaShop\Classes\Business\Interfaces\ProxyInterfaces\ChannelEngineProxyInterface;
+use ChannelEngine\PrestaShop\Classes\Business\Interfaces\ServiceInterfaces\LoginServiceInterface;
+use ChannelEngine\PrestaShop\Classes\Business\Interfaces\ServiceInterfaces\SyncServiceInterface;
+use ChannelEngine\PrestaShop\Classes\Business\Services\LoginService;
+use ChannelEngine\PrestaShop\Classes\Business\Services\SyncService;
+use ChannelEngine\PrestaShop\Classes\Proxy\ChannelEngineProxy;
+use ChannelEngine\PrestaShop\Classes\Utility\ServiceRegistry;
+use Exception;
 
 /**
  * Class Bootstrap
  *
- * This class initializes and registers all the necessary services and controllers.
+ * This class initializes and registers all the necessary services and repositories.
  */
 class Bootstrap
 {
     /**
-     * Initialize and register all services and controllers.
+     * Initialize and register all proxies, repositories, and services.
      *
      * @throws Exception
      */
     public static function initialize(): void
     {
+        self::registerProxy();
         self::registerRepos();
         self::registerServices();
-        self::registerControllers();
+    }
+
+    /**
+     * Registers proxy instances with the service registry.
+     * @return void
+     */
+    protected static function registerProxy(): void
+    {
+        ServiceRegistry::getInstance()->register(ChannelEngineProxyInterface::class, new ChannelEngineProxy());
     }
 
     /**
@@ -29,6 +45,8 @@ class Bootstrap
      */
     protected static function registerRepos(): void
     {
+        //ServiceRegistry::getInstance()->register(ProductRepositoryInterface::class, new ProductRepository());
+        //ServiceRegistry::getInstance()->register(CategoryRepositoryInterface::class, new CategoryRepository());
     }
 
     /**
@@ -39,15 +57,12 @@ class Bootstrap
      */
     protected static function registerServices(): void
     {
-    }
+        ServiceRegistry::getInstance()->register(LoginServiceInterface::class, new LoginService(
+            ServiceRegistry::getInstance()->get(ChannelEngineProxyInterface::class)
+        ));
 
-    /**
-     * Registers controller instances with the service registry.
-     * @return void
-     *
-     * @throws Exception
-     */
-    protected static function registerControllers(): void
-    {
+        ServiceRegistry::getInstance()->register(SyncServiceInterface::class, new SyncService(
+            ServiceRegistry::getInstance()->get(ChannelEngineProxyInterface::class)
+        ));
     }
 }

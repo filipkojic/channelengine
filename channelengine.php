@@ -24,6 +24,7 @@
  *  International Registered Trademark & Property of PrestaShop SA
  */
 
+use ChannelEngine\PrestaShop\Classes\Bootstrap;
 use ChannelEngine\PrestaShop\Classes\Utility\ChannelEngineInstaller;
 
 if (!defined('_PS_VERSION_')) {
@@ -59,6 +60,8 @@ class ChannelEngine extends Module
         $this->description = $this->l('Filip\'s Channel Engine.');
 
         $this->ps_versions_compliancy = ['min' => '8.1', 'max' => _PS_VERSION_];
+
+        Bootstrap::initialize();
     }
 
     /**
