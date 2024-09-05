@@ -2,10 +2,11 @@
 
 namespace ChannelEngine\PrestaShop\Classes\Proxy;
 
+use ChannelEngine\PrestaShop\Classes\Business\Interfaces\ProxyInterfaces\ChannelEngineProxyInterface;
 use ChannelEngine\PrestaShop\Classes\Utility\HttpClient;
 use Configuration;
 
-class ChannelEngineProxy
+class ChannelEngineProxy implements ChannelEngineProxyInterface
 {
     protected $httpClient;
 
