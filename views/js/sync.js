@@ -1,26 +1,26 @@
 document.addEventListener('DOMContentLoaded', function() {
-    document.getElementById('sync-button').addEventListener('click', function() {
-        // Display loading message or spinner
-        //alert('Synchronization started...');
+    let syncButton = document.getElementById('sync-button');
 
-        // Make an AJAX request to start synchronization
+    syncButton.addEventListener('click', function() {
+        // Pošalji AJAX POST zahtev ka backendu
         fetch(admin_link + '&action=startSync', {
-            method: 'GET',
+            method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
+                'Content-Type': 'application/json'
             }
         })
             .then(response => response.json())
             .then(data => {
+                // Obrada odgovora
                 if (data.success) {
-                    alert('Synchronization completed successfully.');
+                    document.querySelector('.sync-status').innerHTML = '<span class="sync-done">Synchronization successful!</span>';
                 } else {
-                    alert('An error occurred during synchronization.');
+                    document.querySelector('.sync-status').innerHTML = '<span class="sync-error">Synchronization failed: ' + data.message + '</span>';
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('An unexpected error occurred.');
+                document.querySelector('.sync-status').innerHTML = '<span class="sync-error">An error occurred during synchronization</span>';
             });
     });
 });
