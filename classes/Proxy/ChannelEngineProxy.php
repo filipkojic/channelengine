@@ -3,51 +3,67 @@
 namespace ChannelEngine\PrestaShop\Classes\Proxy;
 
 use ChannelEngine\PrestaShop\Classes\Utility\HttpClient;
+use Configuration;
 
 class ChannelEngineProxy
 {
-    private $httpClient;
-    private $apiKey;
+    protected $httpClient;
+
+    public function __construct()
+    {
+        $this->httpClient = HttpClient::getInstance();
+    }
 
     /**
-     * ChannelEngineProxy constructor.
+     * Validacija kredencijala sa prosleđenim API ključem.
      *
      * @param string $apiKey
+     * @return mixed
+     * @throws \Exception
      */
-    public function __construct($apiKey)
+    public function validateCredentials($apiKey)
     {
-        $this->httpClient = new HttpClient();
-        $this->apiKey = $apiKey;
+        $url = 'https://logeecom-1-dev.channelengine.net/api/v2/settings?apikey=' . $apiKey;
+
+        $headers = ['Accept: application/json'];
+
+        $response = $this->httpClient->get($url, $headers);
+
+        return $this->validateResponse($response);
     }
 
     /**
-     * Validate API key by sending a request to the ChannelEngine API.
+     * Sinhronizacija proizvoda sa ChannelEngine.
      *
-     * @return array
+     * @param array $products
+     * @return mixed
      * @throws \Exception
      */
-    public function validateCredentials()
+    public function syncProducts(array $products)
     {
-        $url = 'https://logeecom-1-dev.channelengine.net/api/v2/settings?apikey=' . $this->apiKey;
-        $headers = ['accept: application/json'];
+        $url = 'https://' . Configuration::get('CHANNELENGINE_ACCOUNT_NAME') . '.channelengine.net/api/v2/products?apikey=' . Configuration::get('CHANNELENGINE_API_KEY');
 
-        return $this->httpClient->get($url, $headers);
+        $headers = ['Content-Type: application/json'];
+
+        $response = $this->httpClient->post($url, $products, $headers);
+
+        return $this->validateResponse($response);
     }
 
     /**
-     * Example of fetching product data from the API.
+     * Proverava da li je odgovor uspešan.
      *
-     * @return array
+     * @param array $response
+     * @return bool
      * @throws \Exception
      */
-    public function fetchProducts()
+    private function validateResponse($response)
     {
-        $url = 'https://logeecom-1-dev.channelengine.net/api/v2/products?apikey=' . $this->apiKey;
-        $headers = ['accept: application/json'];
-
-        return $this->httpClient->get($url, $headers);
+        if (isset($response['Success']) && $response['Success'] === true) {
+            return true;
+        }
+        throw new \Exception('API error: ' . ($response['Message'] ?? 'Unknown error'));
     }
-
-    // Dodaj druge metode za interakciju sa ChannelEngine API-jem po potrebi
 }
+
 

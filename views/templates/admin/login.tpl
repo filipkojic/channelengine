@@ -6,10 +6,6 @@
         <a href="{$module_dir}"><img src="{$module_dir}views/img/close.png" alt="Close"></a>
     </div>
 
-    {if isset($error)}
-        <div class="error">{$error}</div>
-    {/if}
-
     <p class="login-message">Please enter account data:</p>
     <form id="login-form" method="post" action="{$link->getAdminLink('AdminChannelEngine')}&action=handleLogin">
         <div class="form-group">

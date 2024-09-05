@@ -1,5 +1,7 @@
 <?php
 
+use ChannelEngine\PrestaShop\Classes\Proxy\ChannelEngineProxy;
+
 /**
  * AdminChannelEngineController class
  *
@@ -86,29 +88,22 @@ class AdminChannelEngineController extends ModuleAdminController
         $apiKey = Tools::getValue('api_key');
         $accountName = Tools::getValue('account_name');
 
-        $url = 'https://logeecom-1-dev.channelengine.net/api/v2/settings?apikey=' . $apiKey;
+        $channelEngineProxy = new ChannelEngineProxy();
 
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch, CURLOPT_HTTPGET, 1);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, ['accept: application/json']);
+        try {
+            // Validacija kredencijala putem proxy-ja
+            $responseData = $channelEngineProxy->validateCredentials($apiKey);
 
-        $response = curl_exec($ch);
-        curl_close($ch);
-
-        $responseData = json_decode($response, true);
-
-        if ($responseData['StatusCode'] == 200 && $responseData['Success'] === true) {
-            // Čuvanje API ključevima u PrestaShop CONFIGURATION
+            // Ako je validacija uspešna, čuvamo API ključ i naziv naloga u PrestaShop konfiguraciji
             Configuration::updateValue('CHANNELENGINE_ACCOUNT_NAME', $accountName);
             Configuration::updateValue('CHANNELENGINE_API_KEY', $apiKey);
 
             // Redirekcija na sinhronizaciju
             Tools::redirectAdmin($this->context->link->getAdminLink('AdminChannelEngine') . '&action=displaySync');
-        } else {
+        } catch (Exception $e) {
+            // U slučaju greške, prikazujemo poruku o grešci na login stranici
             $this->context->smarty->assign([
-                'error' => 'Login failed. Please check your credentials.'
+                'error' => 'Login failed. Please check your credentials: '
             ]);
             $this->displayLogin();
         }
@@ -145,48 +140,22 @@ class AdminChannelEngineController extends ModuleAdminController
                 $products[] = $product;
             }
 
-            // Priprema API zahteva za ChannelEngine
-            $apiKey = Configuration::get('CHANNELENGINE_API_KEY'); // Dobavljaš API ključ iz konfiguracije
-            $apiUrl = 'https://logeecom-1-dev.channelengine.net/api/v2/products?apikey=' . $apiKey;
+            // Inicijalizacija ChannelEngineProxy-a
+            $channelEngineProxy = new ChannelEngineProxy();
 
-            // Kreiranje cURL zahteva
-            $ch = curl_init($apiUrl);
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($ch, CURLOPT_POST, true);
-
-            // Header koji definiše da se šalje JSON
-            curl_setopt($ch, CURLOPT_HTTPHEADER, [
-                'Content-Type: application/json',
-            ]);
-
-            // Slanje podataka u JSON formatu
-            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($products));
-
-            // Izvršenje zahteva
-            $response = curl_exec($ch);
-
-            // Proveri da li je bilo greške prilikom cURL zahteva
-            if (curl_errno($ch)) {
-                throw new Exception('cURL error: ' . curl_error($ch));
-            }
-
-            curl_close($ch);
-
-            // Procesiranje odgovora
-            $responseData = json_decode($response, true);
+            // Slanje proizvoda putem proxy-ja
+            $response = $channelEngineProxy->syncProducts($products);
 
             // Provera uspeha zahteva prema API-ju
-            if (isset($responseData['Success']) && $responseData['Success'] === true) {
+            if ($response === true) {
                 $this->sendJsonResponse(true, 'Synchronization successful!');
             } else {
-                $errorMessage = $responseData['Message'] ?? 'Unknown error occurred';
+                $errorMessage = $response['Message'] ?? 'Unknown error occurred';
                 $this->sendJsonResponse(false, 'Synchronization failed: ' . $errorMessage);
             }
         } catch (Exception $e) {
             $this->sendJsonResponse(false, 'An error occurred: ' . $e->getMessage());
         }
-
-        exit;
     }
 
     /**
@@ -205,8 +174,5 @@ class AdminChannelEngineController extends ModuleAdminController
         header('Content-Type: application/json');
         echo json_encode($response);
     }
-
-
-
 
 }
