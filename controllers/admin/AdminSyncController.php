@@ -35,6 +35,7 @@ class AdminSyncController extends ModuleAdminController
      */
     public function startSync()
     {
+        //
         $id_lang = (int)$this->context->language->id;
 
         try {

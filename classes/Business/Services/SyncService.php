@@ -51,7 +51,7 @@ class SyncService implements SyncServiceInterface
         if (!ServiceRegistry::getInstance()->get(LoginServiceInterface::class)->isUserLoggedIn()) {
             throw new Exception('Not connected to ChannelEngine. Please configure API credentials.');
         }
-
+//
         // Dobavljanje proizvoda iz repozitorijuma
         $product = $this->productRepository->getProductById($productId);
 
