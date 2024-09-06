@@ -6,6 +6,7 @@ use ChannelEngine\PrestaShop\Classes\Business\Interfaces\ProxyInterfaces\Channel
 use ChannelEngine\PrestaShop\Classes\Business\Interfaces\RepositoryInterfaces\ProductRepositoryInterface;
 use ChannelEngine\PrestaShop\Classes\Business\Interfaces\ServiceInterfaces\SyncServiceInterface;
 use ChannelEngine\PrestaShop\Classes\Proxy\ChannelEngineProxy;
+use Exception;
 use Product;
 
 class SyncService implements SyncServiceInterface
@@ -39,6 +40,27 @@ class SyncService implements SyncServiceInterface
         // Slanje proizvoda ka proxy-ju
         return $this->channelEngineProxy->syncProducts($formattedProducts);
     }
+
+    /**
+     * @throws \Exception
+     */
+    public function syncSingleProduct($productId)
+    {
+        // Dobavljanje proizvoda iz repozitorijuma
+        $product = $this->productRepository->getProductById($productId);
+
+        // Proveri da li je proizvod pronađen
+        if (!$product) {
+            throw new Exception('Product not found: ' . $productId);
+        }
+
+        // Formatiraj proizvod u asocijativni niz
+        $formattedProduct = $product->toArray();
+
+        // Pozovi proxy da sinhronizuje proizvod sa ChannelEngine-om
+        return $this->channelEngineProxy->syncProducts([$formattedProduct]);
+    }
+
 
     /**
      * Preuzima i formatira proizvode iz PrestaShop baze.

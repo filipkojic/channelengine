@@ -18,7 +18,6 @@ class ChannelEngineInstaller
     private $module;
 
     private static $hooks = [
-        'actionProductAdd',
         'actionProductUpdate'
     ];
 

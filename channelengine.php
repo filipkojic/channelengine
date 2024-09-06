@@ -25,7 +25,9 @@
  */
 
 use ChannelEngine\PrestaShop\Classes\Bootstrap;
+use ChannelEngine\PrestaShop\Classes\Business\Interfaces\ServiceInterfaces\SyncServiceInterface;
 use ChannelEngine\PrestaShop\Classes\Utility\ChannelEngineInstaller;
+use ChannelEngine\PrestaShop\Classes\Utility\ServiceRegistry;
 
 if (!defined('_PS_VERSION_')) {
     exit;
@@ -63,7 +65,7 @@ class ChannelEngine extends Module
         $this->description = $this->l('Filip\'s Channel Engine.');
 
         $this->ps_versions_compliancy = ['min' => '8.1', 'max' => _PS_VERSION_];
-
+        // $this->registerHook('actionProductSave');
         Bootstrap::initialize();
     }
 
@@ -95,16 +97,21 @@ class ChannelEngine extends Module
         Tools::redirectAdmin($link);
     }
 
-    public function hookActionProductAdd($params)
-    {
-        /*$controller = new AdminChannelEngineController();
-        $controller->syncProduct($params['id_product']);*/
-    }
-
     public function hookActionProductUpdate($params)
     {
-        /*$controller = new AdminChannelEngineController();
-        $controller->syncProduct($params['id_product']);*/
+        if (isset($params['id_product'])) {
+            $productId = (int) $params['id_product'];
+
+            try {
+                // Koristi servis za sinhronizaciju
+                $syncService = ServiceRegistry::getInstance()->get(SyncServiceInterface::class);
+                $syncService->syncSingleProduct($productId);
+
+                PrestaShopLogger::addLog('Synchronization successful for product ID: ' . $productId, 1);
+            } catch (Exception $e) {
+                PrestaShopLogger::addLog('Error during synchronization for product ID: ' . $productId . ' - ' . $e->getMessage(), 3);
+            }
+        }
     }
 
 }

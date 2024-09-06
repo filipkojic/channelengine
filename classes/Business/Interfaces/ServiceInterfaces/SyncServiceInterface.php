@@ -13,6 +13,9 @@ interface SyncServiceInterface
      */
     public function startSync(int $langId);
 
+    public function syncSingleProduct($productId);
+
+
     /**
      * Preuzima i formatira proizvode iz PrestaShop baze.
      *
