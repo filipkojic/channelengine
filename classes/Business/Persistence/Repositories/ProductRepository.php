@@ -29,22 +29,22 @@ class ProductRepository implements ProductRepositoryInterface
     public function getProductById($productId): ?DomainProduct
     {
         $langId = (int)Context::getContext()->language->id; // Postavi jezik
-        // Dohvati sve proizvode
-        $allProducts = Product::getProducts($langId, 0, 0, 'id_product', 'ASC');
 
-        // Filtriraj proizvode po zadatom ID-ju
-        foreach ($allProducts as $productData) {
-            if ((int)$productData['id_product'] === (int)$productId) {
-                return new DomainProduct(
-                    $productData['id_product'],
-                    $productData['name'],
-                    $productData['description'] ?? '',
-                    (float)$productData['price']
-                );
-            }
+        // Kreiraj objekat proizvoda na osnovu ID-ja
+        $product = new Product($productId, false, $langId);
+
+        // Proveri da li je proizvod validan (postoji u bazi)
+        if (!$product->id) {
+            return null; // Ako proizvod ne postoji, vraćamo null
         }
 
-        // Ako proizvod nije pronađen, vraćamo null
-        return null;
+        // Vraćamo instancu domenskog modela proizvoda
+        return new DomainProduct(
+            $product->id,
+            $product->name, // Višejezično polje name
+            $product->description, // Višejezično polje description
+            (float)$product->price // Cena proizvoda
+        );
     }
+
 }
