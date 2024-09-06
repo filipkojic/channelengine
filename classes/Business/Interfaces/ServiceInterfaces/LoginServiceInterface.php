@@ -13,5 +13,7 @@ interface LoginServiceInterface
      * @throws \Exception
      */
     public function handleLogin(string $apiKey, string $accountName): bool;
+
+    public function isUserLoggedIn(): bool;
 }
 

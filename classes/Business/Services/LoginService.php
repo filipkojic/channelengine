@@ -36,4 +36,12 @@ class LoginService implements LoginServiceInterface
 
         return false;
     }
+
+    public function isUserLoggedIn(): bool
+    {
+        $apiKey = Configuration::get('CHANNELENGINE_API_KEY');
+        $accountName = Configuration::get('CHANNELENGINE_ACCOUNT_NAME');
+
+        return $apiKey && $accountName;
+    }
 }
