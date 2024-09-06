@@ -4,8 +4,10 @@ namespace ChannelEngine\PrestaShop\Classes\Business\Services;
 
 use ChannelEngine\PrestaShop\Classes\Business\Interfaces\ProxyInterfaces\ChannelEngineProxyInterface;
 use ChannelEngine\PrestaShop\Classes\Business\Interfaces\RepositoryInterfaces\ProductRepositoryInterface;
+use ChannelEngine\PrestaShop\Classes\Business\Interfaces\ServiceInterfaces\LoginServiceInterface;
 use ChannelEngine\PrestaShop\Classes\Business\Interfaces\ServiceInterfaces\SyncServiceInterface;
 use ChannelEngine\PrestaShop\Classes\Proxy\ChannelEngineProxy;
+use ChannelEngine\PrestaShop\Classes\Utility\ServiceRegistry;
 use Exception;
 use Product;
 
@@ -46,6 +48,10 @@ class SyncService implements SyncServiceInterface
      */
     public function syncSingleProduct($productId)
     {
+        if (!ServiceRegistry::getInstance()->get(LoginServiceInterface::class)->isUserLoggedIn()) {
+            throw new Exception('Not connected to ChannelEngine. Please configure API credentials.');
+        }
+
         // Dobavljanje proizvoda iz repozitorijuma
         $product = $this->productRepository->getProductById($productId);
 
