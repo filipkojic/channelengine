@@ -44,6 +44,9 @@ class ChannelEngine extends Module
 {
     protected $config_form = false;
 
+    /**
+     * @throws Exception
+     */
     public function __construct()
     {
         $this->name = 'channelengine';
@@ -91,4 +94,17 @@ class ChannelEngine extends Module
         $link = $this->context->link->getAdminLink('AdminChannelEngine');
         Tools::redirectAdmin($link);
     }
+
+    public function hookActionProductAdd($params)
+    {
+        /*$controller = new AdminChannelEngineController();
+        $controller->syncProduct($params['id_product']);*/
+    }
+
+    public function hookActionProductUpdate($params)
+    {
+        /*$controller = new AdminChannelEngineController();
+        $controller->syncProduct($params['id_product']);*/
+    }
+
 }

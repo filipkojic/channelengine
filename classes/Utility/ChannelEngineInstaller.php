@@ -17,6 +17,12 @@ class ChannelEngineInstaller
 {
     private $module;
 
+    private static $hooks = [
+        'actionProductAdd',
+        'actionProductUpdate'
+    ];
+
+
     public function __construct($module)
     {
         $this->module = $module;
@@ -28,7 +34,8 @@ class ChannelEngineInstaller
     public function install()
     {
         return $this->createCredentialsTable() &&
-            $this->addMenuItem();
+            $this->addMenuItem() &&
+            $this->addHooks();
     }
 
     /**
@@ -36,7 +43,9 @@ class ChannelEngineInstaller
      */
     public function uninstall()
     {
-        return $this->dropCredentialsTable() && $this->removeMenuItem();
+        return $this->dropCredentialsTable() &&
+            $this->removeMenuItem() &&
+            $this->removeHooks();
     }
 
     /**
@@ -95,4 +104,28 @@ class ChannelEngineInstaller
         }
         return false;
     }
+
+    private function addHooks()
+    {
+        $result = true;
+
+        foreach (self::$hooks as $hook) {
+            $result = $result && $this->module->registerHook($hook);
+        }
+
+        return $result;
+    }
+
+    private function removeHooks()
+    {
+        $result = true;
+
+        foreach (self::$hooks as $hook) {
+            $result = $result && $this->module->unregisterHook($hook);
+        }
+
+        return $result;
+    }
+
+
 }
