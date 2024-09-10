@@ -4,10 +4,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     syncButton.addEventListener('click', async function() {
         try {
-            // Prikaži status "In progress" pre nego što započne sinhronizacija
             syncStatus.innerHTML = '<span class="sync-progress">In progress...</span>';
 
-            // Pošalji AJAX POST zahtev ka backendu
             let response = await fetch(admin_link + '&action=startSync', {
                 method: 'POST',
                 headers: {
@@ -17,7 +15,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
             let data = await response.json();
 
-            // Obrada odgovora
             if (data.success) {
                 syncStatus.innerHTML = '<span class="sync-done">Synchronization successful!</span>';
             } else {
