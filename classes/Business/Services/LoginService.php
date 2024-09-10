@@ -31,7 +31,7 @@ class LoginService implements LoginServiceInterface
      */
     public function handleLogin(string $apiKey, string $accountName): bool
     {
-        $response = $this->channelEngineProxy->validateCredentials($apiKey);
+        $response = $this->channelEngineProxy->validateCredentials($apiKey, $accountName);
 
         if ($response === true) {
             Configuration::updateValue('CHANNELENGINE_ACCOUNT_NAME', $accountName);

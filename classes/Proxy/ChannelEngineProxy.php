@@ -5,6 +5,7 @@ namespace ChannelEngine\PrestaShop\Classes\Proxy;
 use ChannelEngine\PrestaShop\Classes\Business\Interfaces\ProxyInterfaces\ChannelEngineProxyInterface;
 use ChannelEngine\PrestaShop\Classes\Utility\HttpClient;
 use Configuration;
+use PrestaShopLogger;
 
 /**
  * Proxy class responsible for communication with the ChannelEngine API.
@@ -28,13 +29,17 @@ class ChannelEngineProxy implements ChannelEngineProxyInterface
     /**
      * {@inheritDoc}
      */
-    public function validateCredentials(string $apiKey): bool
+    public function validateCredentials(string $apiKey, string $accountName): bool
     {
-        $url = 'https://logeecom-1-dev.channelengine.net/api/v2/settings?apikey=' . $apiKey;
-        $headers = ['Accept: application/json'];
-        $response = $this->httpClient->get($url, $headers);
+        try {
+            $url = 'https://' . $accountName . '.channelengine.net/api/v2/settings?apikey=' . $apiKey;
+            $headers = ['Accept: application/json'];
+            $response = $this->httpClient->get($url, $headers);
 
-        return $this->validateResponse($response);
+            return $this->validateResponse($response);
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 
     /**

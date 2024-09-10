@@ -15,10 +15,11 @@ interface ChannelEngineProxyInterface
      * for future API requests.
      *
      * @param string $apiKey The API key to be validated.
+     * @param string $accountName The account name to be validated.
      * @return bool True if the API key is valid, false otherwise.
      * @throws \Exception Throws an exception if validation fails or the API is unreachable.
      */
-    public function validateCredentials(string $apiKey): bool;
+    public function validateCredentials(string $apiKey, string $accountName): bool;
 
     /**
      * Synchronizes products with ChannelEngine by sending product data.
