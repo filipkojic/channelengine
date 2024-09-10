@@ -48,9 +48,7 @@ class ChannelEngineInstaller
      */
     public function install(): bool
     {
-        return $this->createCredentialsTable() &&
-            $this->addMenuItem() &&
-            $this->addHooks();
+        return $this->addMenuItem() && $this->addHooks();
     }
 
     /**
@@ -63,39 +61,7 @@ class ChannelEngineInstaller
      */
     public function uninstall(): bool
     {
-        return $this->dropCredentialsTable() &&
-            $this->removeMenuItem() &&
-            $this->removeHooks();
-    }
-
-    /**
-     * Creates the credentials table for storing ChannelEngine API credentials.
-     *
-     * This table stores the account name and API key required for communication with ChannelEngine.
-     *
-     * @return bool True if the table was successfully created, false otherwise.
-     */
-    private function createCredentialsTable(): bool
-    {
-        $sql = 'CREATE TABLE IF NOT EXISTS ' . _DB_PREFIX_ . 'channelengine_credentials (
-                id INT(11) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-                account_name VARCHAR(255) NOT NULL,
-                api_key VARCHAR(255) NOT NULL,
-                date_add DATETIME NOT NULL
-            ) ENGINE=' . _MYSQL_ENGINE_ . ' DEFAULT CHARSET=utf8;';
-
-        return Db::getInstance()->execute($sql);
-    }
-
-    /**
-     * Drops the credentials table during uninstallation.
-     *
-     * @return bool True if the table was successfully dropped, false otherwise.
-     */
-    private function dropCredentialsTable(): bool
-    {
-        $sql = 'DROP TABLE IF EXISTS ' . _DB_PREFIX_ . 'channelengine_credentials';
-        return Db::getInstance()->execute($sql);
+        return $this->removeMenuItem() && $this->removeHooks();
     }
 
     /**
