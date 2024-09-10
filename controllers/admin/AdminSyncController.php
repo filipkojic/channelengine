@@ -29,8 +29,10 @@ class AdminSyncController extends ModuleAdminController
      * This method initializes the content of the page based on the 'action'
      * parameter from the request. If the specified action exists as a method,
      * it is called; otherwise, the defaultAction method is called.
+     *
+     * @return void
      */
-    public function initContent()
+    public function initContent(): void
     {
         $action = Tools::getValue('action', 'defaultAction');
 
@@ -50,7 +52,7 @@ class AdminSyncController extends ModuleAdminController
      *
      * @return void
      */
-    public function startSync()
+    public function startSync(): void
     {
         $id_lang = (int)$this->context->language->id;
 

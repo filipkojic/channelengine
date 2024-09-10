@@ -18,9 +18,9 @@
  * versions in the future. If you wish to customize PrestaShop for your
  * needs please refer to http://www.prestashop.com for more information.
  *
- *  @author    PrestaShop SA <contact@prestashop.com>
- *  @copyright 2007-2024 PrestaShop SA
- *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ * @author    PrestaShop SA <contact@prestashop.com>
+ * @copyright 2007-2024 PrestaShop SA
+ * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  *  International Registered Trademark & Property of PrestaShop SA
  */
 
@@ -86,7 +86,7 @@ class ChannelEngine extends Module
      *
      * @return bool True if installation was successful, false otherwise.
      */
-    public function install()
+    public function install(): bool
     {
         $installer = new ChannelEngineInstaller($this);
         return parent::install() && $installer->install();
@@ -100,7 +100,7 @@ class ChannelEngine extends Module
      *
      * @return bool True if uninstallation was successful, false otherwise.
      */
-    public function uninstall()
+    public function uninstall(): bool
     {
         $installer = new ChannelEngineInstaller($this);
         return $installer->uninstall() && parent::uninstall();
@@ -111,8 +111,10 @@ class ChannelEngine extends Module
      *
      * This method handles the redirection to the module's admin interface where the
      * user can configure the ChannelEngine settings.
+     *
+     * @return void
      */
-    public function getContent()
+    public function getContent(): void
     {
         $link = $this->context->link->getAdminLink('AdminChannelEngine');
         Tools::redirectAdmin($link);
@@ -128,10 +130,10 @@ class ChannelEngine extends Module
      * @param array $params Parameters passed by the hook, including the product ID.
      * @return void
      */
-    public function hookActionProductUpdate($params)
+    public function hookActionProductUpdate(array $params): void
     {
         if (isset($params['id_product'])) {
-            $productId = (int) $params['id_product'];
+            $productId = (int)$params['id_product'];
 
             try {
                 $syncService = ServiceRegistry::getInstance()->get(SyncServiceInterface::class);
@@ -143,5 +145,4 @@ class ChannelEngine extends Module
             }
         }
     }
-
 }

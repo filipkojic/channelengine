@@ -31,8 +31,10 @@ class AdminChannelEngineController extends ModuleAdminController
      * This method initializes the content of the page based on the 'action'
      * parameter from the request. If the specified action exists as a method,
      * it is called; otherwise, the defaultAction method is called.
+     *
+     * @return void
      */
-    public function initContent()
+    public function initContent(): void
     {
         $action = Tools::getValue('action', 'defaultAction');
 
@@ -51,8 +53,10 @@ class AdminChannelEngineController extends ModuleAdminController
      * This method is the default action, which displays the welcome page of the
      * Channel Engine module. It loads the necessary CSS and JS files and assigns
      * the module directory path to the Smarty template.
+     *
+     * @return void
      */
-    protected function defaultAction()
+    protected function defaultAction(): void
     {
         if (ServiceRegistry::getInstance()->get(LoginServiceInterface::class)->isUserLoggedIn()) {
             $this->displaySync();
@@ -78,8 +82,10 @@ class AdminChannelEngineController extends ModuleAdminController
      * This method displays the login page for the Channel Engine module.
      * It assigns the module directory path to the Smarty template and
      * fetches the login template.
+     *
+     * @return void
      */
-    protected function displayLogin()
+    protected function displayLogin(): void
     {
         $this->context->smarty->assign([
             'module_dir' => $this->module->getPathUri(),
@@ -94,8 +100,10 @@ class AdminChannelEngineController extends ModuleAdminController
      * Display Sync
      *
      * Displays the sync page for the Channel Engine module.
+     *
+     * @return void
      */
-    protected function displaySync()
+    protected function displaySync(): void
     {
         $this->context->smarty->assign([
             'module_dir' => $this->module->getPathUri(),
@@ -111,8 +119,10 @@ class AdminChannelEngineController extends ModuleAdminController
      *
      * Handles the login form submission and validates the provided API key and account name.
      * If the login is successful, redirects to the sync page. Otherwise, displays an error message.
+     *
+     * @return void
      */
-    public function handleLogin()
+    public function handleLogin(): void
     {
         $apiKey = Tools::getValue('api_key');
         $accountName = Tools::getValue('account_name');
