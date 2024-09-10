@@ -32,13 +32,14 @@ class AdminSyncController extends ModuleAdminController
      */
     public function initContent()
     {
-        $action = Tools::getValue('action', 'defaultAction'); // Default action is 'defaultAction'
+        $action = Tools::getValue('action', 'defaultAction');
 
-        if (method_exists($this, $action)) {
-            $this->$action(); // Call the method corresponding to the action
-        } else {
-            // $this->defaultAction(); // Call the default action if the method does not exist
+        if (!method_exists($this, $action)) {
+            $this->sendJsonResponse(false, 'Invalid action: ' . $action);
+            return;
         }
+
+        $this->$action();
     }
 
     /**
@@ -57,15 +58,17 @@ class AdminSyncController extends ModuleAdminController
             $syncService = ServiceRegistry::getInstance()->get(SyncServiceInterface::class);
             $response = $syncService->startSync($id_lang);
 
-            if ($response === true) {
-                $this->sendJsonResponse(true, 'Synchronization successful!');
-            } else {
+            if ($response !== true) {
                 $this->sendJsonResponse(false, 'Synchronization failed: Unknown error occurred');
+                return;
             }
+
+            $this->sendJsonResponse(true, 'Synchronization successful!');
         } catch (Exception $e) {
             $this->sendJsonResponse(false, 'An error occurred: ' . $e->getMessage());
         }
     }
+
 
     /**
      * Sends a JSON response to the client.

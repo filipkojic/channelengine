@@ -34,13 +34,15 @@ class AdminChannelEngineController extends ModuleAdminController
      */
     public function initContent()
     {
-        $action = Tools::getValue('action', 'defaultAction'); // Default action is 'defaultAction'
+        $action = Tools::getValue('action', 'defaultAction');
 
-        if (method_exists($this, $action)) {
-            $this->$action(); // Call the method corresponding to the action
-        } else {
-            $this->defaultAction(); // Call the default action if the method does not exist
+        if (!method_exists($this, $action)) {
+            $this->defaultAction();
+
+            return;
         }
+
+        $this->$action();
     }
 
     /**
@@ -54,6 +56,7 @@ class AdminChannelEngineController extends ModuleAdminController
     {
         if (ServiceRegistry::getInstance()->get(LoginServiceInterface::class)->isUserLoggedIn()) {
             $this->displaySync();
+
             return;
         }
 
@@ -64,7 +67,8 @@ class AdminChannelEngineController extends ModuleAdminController
             'module_dir' => $this->module->getPathUri(),
         ]);
 
-        $output = $this->context->smarty->fetch($this->module->getLocalPath().'views/templates/admin/configure.tpl');
+        $output = $this->context->smarty
+            ->fetch($this->module->getLocalPath() . 'views/templates/admin/configure.tpl');
         $this->context->smarty->assign('content', $output);
     }
 
@@ -81,7 +85,8 @@ class AdminChannelEngineController extends ModuleAdminController
             'module_dir' => $this->module->getPathUri(),
         ]);
 
-        $output = $this->context->smarty->fetch($this->module->getLocalPath().'views/templates/admin/login.tpl');
+        $output = $this->context->smarty
+            ->fetch($this->module->getLocalPath() . 'views/templates/admin/login.tpl');
         $this->context->smarty->assign('content', $output);
     }
 
@@ -96,7 +101,8 @@ class AdminChannelEngineController extends ModuleAdminController
             'module_dir' => $this->module->getPathUri(),
         ]);
 
-        $output = $this->context->smarty->fetch($this->module->getLocalPath() . 'views/templates/admin/sync.tpl');
+        $output = $this->context->smarty
+            ->fetch($this->module->getLocalPath() . 'views/templates/admin/sync.tpl');
         $this->context->smarty->assign('content', $output);
     }
 
@@ -112,14 +118,18 @@ class AdminChannelEngineController extends ModuleAdminController
         $accountName = Tools::getValue('account_name');
 
         try {
-            if (ServiceRegistry::getInstance()->get(LoginServiceInterface::class)->handleLogin($apiKey, $accountName)) {
-                Tools::redirectAdmin($this->context->link->getAdminLink('AdminChannelEngine') . '&action=displaySync');
-            } else {
+            if (!ServiceRegistry::getInstance()->get(LoginServiceInterface::class)
+                ->handleLogin($apiKey, $accountName)) {
                 $this->context->smarty->assign([
                     'error' => 'Login failed. Please check your credentials.'
                 ]);
                 $this->displayLogin();
+
+                return;
             }
+
+            Tools::redirectAdmin($this->context->link
+                    ->getAdminLink('AdminChannelEngine') . '&action=displaySync');
         } catch (Exception $e) {
             $this->context->smarty->assign([
                 'error' => 'Login failed.'
@@ -127,5 +137,4 @@ class AdminChannelEngineController extends ModuleAdminController
             $this->displayLogin();
         }
     }
-
 }
