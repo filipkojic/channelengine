@@ -52,22 +52,18 @@ class AdminChannelEngineController extends ModuleAdminController
      */
     protected function defaultAction()
     {
-        // Ako su parametri postavljeni, odmah pozivamo stranicu za sinhronizaciju
         if (ServiceRegistry::getInstance()->get(LoginServiceInterface::class)->isUserLoggedIn()) {
             $this->displaySync();
             return;
         }
 
-        // Add CSS and JS for the welcome page
         $this->context->controller->addCSS($this->module->getPathUri() . 'views/css/welcome.css');
         $this->context->controller->addJS($this->module->getPathUri() . 'views/js/welcome.js');
 
-        // Assign module directory path to Smarty
         $this->context->smarty->assign([
             'module_dir' => $this->module->getPathUri(),
         ]);
 
-        // Fetch the welcome page template and assign it to the content
         $output = $this->context->smarty->fetch($this->module->getLocalPath().'views/templates/admin/configure.tpl');
         $this->context->smarty->assign('content', $output);
     }
@@ -81,16 +77,19 @@ class AdminChannelEngineController extends ModuleAdminController
      */
     protected function displayLogin()
     {
-        // Assign module directory path to Smarty
         $this->context->smarty->assign([
             'module_dir' => $this->module->getPathUri(),
         ]);
 
-        // Fetch the login page template and assign it to the content
         $output = $this->context->smarty->fetch($this->module->getLocalPath().'views/templates/admin/login.tpl');
         $this->context->smarty->assign('content', $output);
     }
 
+    /**
+     * Display Sync
+     *
+     * Displays the sync page for the Channel Engine module.
+     */
     protected function displaySync()
     {
         $this->context->smarty->assign([
@@ -101,6 +100,12 @@ class AdminChannelEngineController extends ModuleAdminController
         $this->context->smarty->assign('content', $output);
     }
 
+    /**
+     * Handle Login
+     *
+     * Handles the login form submission and validates the provided API key and account name.
+     * If the login is successful, redirects to the sync page. Otherwise, displays an error message.
+     */
     public function handleLogin()
     {
         $apiKey = Tools::getValue('api_key');

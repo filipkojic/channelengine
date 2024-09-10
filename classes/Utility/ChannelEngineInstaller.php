@@ -3,6 +3,7 @@
 namespace ChannelEngine\PrestaShop\Classes\Utility;
 
 use Db;
+use Module;
 use Tab;
 use Language;
 
@@ -15,13 +16,23 @@ use Language;
  */
 class ChannelEngineInstaller
 {
+    /**
+     * @var Module The module instance.
+     */
     private $module;
 
+    /**
+     * @var array The list of hooks that this module will register.
+     */
     private static $hooks = [
         'actionProductUpdate'
     ];
 
-
+    /**
+     * Constructor for the ChannelEngineInstaller.
+     *
+     * @param Module $module The module instance used for installation/uninstallation.
+     */
     public function __construct($module)
     {
         $this->module = $module;
@@ -29,8 +40,13 @@ class ChannelEngineInstaller
 
     /**
      * Handles the installation of the module.
+     *
+     * This method calls the necessary steps to install the module,
+     * including creating a credentials table, adding a menu item, and registering hooks.
+     *
+     * @return bool True if the installation was successful, false otherwise.
      */
-    public function install()
+    public function install(): bool
     {
         return $this->createCredentialsTable() &&
             $this->addMenuItem() &&
@@ -39,8 +55,13 @@ class ChannelEngineInstaller
 
     /**
      * Handles the uninstallation of the module.
+     *
+     * This method performs the steps necessary to uninstall the module,
+     * such as dropping the credentials table, removing the menu item, and unregistering hooks.
+     *
+     * @return bool True if the uninstallation was successful, false otherwise.
      */
-    public function uninstall()
+    public function uninstall(): bool
     {
         return $this->dropCredentialsTable() &&
             $this->removeMenuItem() &&
@@ -48,9 +69,13 @@ class ChannelEngineInstaller
     }
 
     /**
-     * Creates the credentials table.
+     * Creates the credentials table for storing ChannelEngine API credentials.
+     *
+     * This table stores the account name and API key required for communication with ChannelEngine.
+     *
+     * @return bool True if the table was successfully created, false otherwise.
      */
-    private function createCredentialsTable()
+    private function createCredentialsTable(): bool
     {
         $sql = 'CREATE TABLE IF NOT EXISTS ' . _DB_PREFIX_ . 'channelengine_credentials (
                 id INT(11) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -63,9 +88,11 @@ class ChannelEngineInstaller
     }
 
     /**
-     * Drops the credentials table.
+     * Drops the credentials table during uninstallation.
+     *
+     * @return bool True if the table was successfully dropped, false otherwise.
      */
-    private function dropCredentialsTable()
+    private function dropCredentialsTable(): bool
     {
         $sql = 'DROP TABLE IF EXISTS ' . _DB_PREFIX_ . 'channelengine_credentials';
         return Db::getInstance()->execute($sql);
@@ -73,12 +100,17 @@ class ChannelEngineInstaller
 
     /**
      * Adds a new tab to the PrestaShop admin menu.
+     *
+     * This method adds a new tab (menu item) under the "Orders" section in the PrestaShop back office,
+     * linking to the ChannelEngine module.
+     *
+     * @return bool True if the tab was successfully added, false otherwise.
      */
-    private function addMenuItem()
+    private function addMenuItem(): bool
     {
         $tab = new Tab();
         $tabRepository = $this->module->get('prestashop.core.admin.tab.repository');
-        $tab->id_parent = (int) $tabRepository->findOneIdByClassName('AdminParentOrders');
+        $tab->id_parent = (int)$tabRepository->findOneIdByClassName('AdminParentOrders');
         $tab->class_name = 'AdminChannelEngine';
         $tab->module = $this->module->name;
         $tab->active = 1;
@@ -91,12 +123,14 @@ class ChannelEngineInstaller
     }
 
     /**
-     * Removes the tab from the PrestaShop admin menu.
+     * Removes the tab from the PrestaShop admin menu during uninstallation.
+     *
+     * @return bool True if the tab was successfully removed, false otherwise.
      */
-    private function removeMenuItem()
+    private function removeMenuItem(): bool
     {
         $tabRepository = $this->module->get('prestashop.core.admin.tab.repository');
-        $id_tab = (int) $tabRepository->findOneIdByClassName('AdminChannelEngine');
+        $id_tab = (int)$tabRepository->findOneIdByClassName('AdminChannelEngine');
         if ($id_tab) {
             $tab = new Tab($id_tab);
             return $tab->delete();
@@ -104,7 +138,12 @@ class ChannelEngineInstaller
         return false;
     }
 
-    private function addHooks()
+    /**
+     * Registers necessary hooks for the module.
+     *
+     * @return bool True if all hooks were successfully registered, false otherwise.
+     */
+    private function addHooks(): bool
     {
         $result = true;
 
@@ -115,7 +154,12 @@ class ChannelEngineInstaller
         return $result;
     }
 
-    private function removeHooks()
+    /**
+     * Unregisters the hooks during uninstallation.
+     *
+     * @return bool True if all hooks were successfully unregistered, false otherwise.
+     */
+    private function removeHooks(): bool
     {
         $result = true;
 

@@ -4,8 +4,19 @@ use ChannelEngine\PrestaShop\Classes\Business\Interfaces\ServiceInterfaces\SyncS
 use ChannelEngine\PrestaShop\Classes\Business\Services\SyncService;
 use ChannelEngine\PrestaShop\Classes\Utility\ServiceRegistry;
 
+/**
+ * Class AdminSyncController
+ *
+ * This class handles the synchronization process of products between PrestaShop
+ * and ChannelEngine, invoked from the PrestaShop admin panel.
+ */
 class AdminSyncController extends ModuleAdminController
 {
+    /**
+     * Constructor
+     *
+     * Initializes the controller with Bootstrap styling and calls the parent constructor.
+     */
     public function __construct()
     {
         $this->bootstrap = true;
@@ -26,20 +37,23 @@ class AdminSyncController extends ModuleAdminController
         if (method_exists($this, $action)) {
             $this->$action(); // Call the method corresponding to the action
         } else {
-            //$this->defaultAction(); // Call the default action if the method does not exist
+            // $this->defaultAction(); // Call the default action if the method does not exist
         }
     }
 
     /**
-     * Pokreće proces sinhronizacije.
+     * Starts the synchronization process.
+     *
+     * This method fetches the language ID from the context, initiates the product synchronization
+     * process via the SyncService, and sends a JSON response based on the result.
+     *
+     * @return void
      */
     public function startSync()
     {
-        //
         $id_lang = (int)$this->context->language->id;
 
         try {
-            // Pokreni sinhronizaciju putem servisa
             $syncService = ServiceRegistry::getInstance()->get(SyncServiceInterface::class);
             $response = $syncService->startSync($id_lang);
 
@@ -54,12 +68,16 @@ class AdminSyncController extends ModuleAdminController
     }
 
     /**
-     * Helper funkcija za slanje JSON odgovora.
+     * Sends a JSON response to the client.
      *
-     * @param bool $success
-     * @param string $message
+     * This helper function is used to send a standardized JSON response
+     * containing a success status and a message.
+     *
+     * @param bool $success Indicates if the operation was successful.
+     * @param string $message The message to be sent in the response.
+     * @return void
      */
-    private function sendJsonResponse(bool $success, string $message)
+    private function sendJsonResponse(bool $success, string $message): void
     {
         $response = [
             'success' => $success,

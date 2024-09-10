@@ -6,9 +6,9 @@ use ChannelEngine\PrestaShop\Classes\Business\Interfaces\ProxyInterfaces\Channel
 use ChannelEngine\PrestaShop\Classes\Business\Interfaces\RepositoryInterfaces\ProductRepositoryInterface;
 use ChannelEngine\PrestaShop\Classes\Business\Interfaces\ServiceInterfaces\LoginServiceInterface;
 use ChannelEngine\PrestaShop\Classes\Business\Interfaces\ServiceInterfaces\SyncServiceInterface;
-use ChannelEngine\PrestaShop\Classes\Business\Persistence\Repositories\ProductRepository;
 use ChannelEngine\PrestaShop\Classes\Business\Services\LoginService;
 use ChannelEngine\PrestaShop\Classes\Business\Services\SyncService;
+use ChannelEngine\PrestaShop\Classes\Persistence\Repositories\ProductRepository;
 use ChannelEngine\PrestaShop\Classes\Proxy\ChannelEngineProxy;
 use ChannelEngine\PrestaShop\Classes\Utility\ServiceRegistry;
 use Exception;

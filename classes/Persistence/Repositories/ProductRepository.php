@@ -1,14 +1,22 @@
 <?php
 
-namespace ChannelEngine\PrestaShop\Classes\Business\Persistence\Repositories;
+namespace ChannelEngine\PrestaShop\Classes\Persistence\Repositories;
 
 use ChannelEngine\PrestaShop\Classes\Business\DomainModels\DomainProduct;
 use ChannelEngine\PrestaShop\Classes\Business\Interfaces\RepositoryInterfaces\ProductRepositoryInterface;
 use Context;
 use Product;
 
+/**
+ * Repository class responsible for retrieving product data from the database.
+ * Implements ProductRepositoryInterface to define methods for fetching products.
+ */
 class ProductRepository implements ProductRepositoryInterface
 {
+
+    /**
+     * {@inheritDoc}
+     */
     public function getProductsByLang(int $langId): array
     {
         $rawProducts = Product::getProducts($langId, 0, 0, 'id_product', 'ASC');
@@ -26,24 +34,23 @@ class ProductRepository implements ProductRepositoryInterface
         return $products;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function getProductById($productId): ?DomainProduct
     {
-        $langId = (int)Context::getContext()->language->id; // Postavi jezik
-
-        // Kreiraj objekat proizvoda na osnovu ID-ja
+        $langId = (int)Context::getContext()->language->id;
         $product = new Product($productId, false, $langId);
 
-        // Proveri da li je proizvod validan (postoji u bazi)
         if (!$product->id) {
-            return null; // Ako proizvod ne postoji, vraćamo null
+            return null;
         }
 
-        // Vraćamo instancu domenskog modela proizvoda
         return new DomainProduct(
             $product->id,
-            $product->name, // Višejezično polje name
-            $product->description, // Višejezično polje description
-            (float)$product->price // Cena proizvoda
+            $product->name,
+            $product->description,
+            (float)$product->price
         );
     }
 

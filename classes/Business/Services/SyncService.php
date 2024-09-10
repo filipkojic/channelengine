@@ -6,16 +6,31 @@ use ChannelEngine\PrestaShop\Classes\Business\Interfaces\ProxyInterfaces\Channel
 use ChannelEngine\PrestaShop\Classes\Business\Interfaces\RepositoryInterfaces\ProductRepositoryInterface;
 use ChannelEngine\PrestaShop\Classes\Business\Interfaces\ServiceInterfaces\LoginServiceInterface;
 use ChannelEngine\PrestaShop\Classes\Business\Interfaces\ServiceInterfaces\SyncServiceInterface;
-use ChannelEngine\PrestaShop\Classes\Proxy\ChannelEngineProxy;
 use ChannelEngine\PrestaShop\Classes\Utility\ServiceRegistry;
 use Exception;
 use Product;
 
+/**
+ * Service class responsible for synchronizing products between PrestaShop and ChannelEngine.
+ */
 class SyncService implements SyncServiceInterface
 {
+    /**
+     * @var ChannelEngineProxyInterface Proxy for interacting with the ChannelEngine API.
+     */
     protected $channelEngineProxy;
+
+    /**
+     * @var ProductRepositoryInterface Repository for accessing PrestaShop product data.
+     */
     protected $productRepository;
 
+    /**
+     * Constructor method for SyncService.
+     *
+     * @param ChannelEngineProxyInterface $proxy Proxy for API interaction.
+     * @param ProductRepositoryInterface $productRepository Repository for product access.
+     */
     public function __construct(ChannelEngineProxyInterface $proxy, ProductRepositoryInterface $productRepository)
     {
         $this->channelEngineProxy = $proxy;
@@ -23,76 +38,57 @@ class SyncService implements SyncServiceInterface
     }
 
     /**
-     * Sinhronizacija proizvoda sa ChannelEngine.
-     *
-     * @param array $products
-     * @return bool|array
-     * @throws \Exception
+     * {@inheritDoc}
      */
     public function startSync(int $langId): bool
     {
-        // Dobavljanje proizvoda iz repozitorijuma
         $products = $this->productRepository->getProductsByLang($langId);
 
-        // Pretvaranje proizvoda u asocijativni niz za API
-        $formattedProducts = array_map(function($product) {
+        $formattedProducts = array_map(function ($product) {
             return $product->toArray();
         }, $products);
 
-        // Slanje proizvoda ka proxy-ju
         return $this->channelEngineProxy->syncProducts($formattedProducts);
     }
 
     /**
-     * @throws \Exception
+     * {@inheritDoc}
      */
-    public function syncSingleProduct($productId)
+    public function syncSingleProduct($productId): bool
     {
         if (!ServiceRegistry::getInstance()->get(LoginServiceInterface::class)->isUserLoggedIn()) {
             throw new Exception('Not connected to ChannelEngine. Please configure API credentials.');
         }
-//
-        // Dobavljanje proizvoda iz repozitorijuma
+
         $product = $this->productRepository->getProductById($productId);
 
-        // Proveri da li je proizvod pronađen
         if (!$product) {
             throw new Exception('Product not found: ' . $productId);
         }
 
-        // Formatiraj proizvod u asocijativni niz
         $formattedProduct = $product->toArray();
 
-        // Pozovi proxy da sinhronizuje proizvod sa ChannelEngine-om
         return $this->channelEngineProxy->syncProducts([$formattedProduct]);
     }
 
-
     /**
-     * Preuzima i formatira proizvode iz PrestaShop baze.
-     *
-     * @param int $langId
-     * @return array
+     * {@inheritDoc}
      */
     public function getFormattedProducts(int $langId): array
     {
-        // Dobavljanje liste proizvoda
         $allProducts = Product::getProducts($langId, 0, 0, 'id_product', 'ASC');
 
-        // Formiranje podataka u formatu koji zahteva ChannelEngine API
         $products = [];
         foreach ($allProducts as $productData) {
             $product = [
-                'MerchantProductNo' => $productData['id_product'], // Unique identifier in PrestaShop
+                'MerchantProductNo' => $productData['id_product'],
                 'Name' => $productData['name'],
                 'Description' => $productData['description'] ?? '',
                 'Price' => (float)$productData['price'],
             ];
-
             $products[] = $product;
         }
 
         return $products;
     }
 }
-

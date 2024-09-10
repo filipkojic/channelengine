@@ -44,10 +44,19 @@ require_once __DIR__ . '/vendor/autoload.php';
  */
 class ChannelEngine extends Module
 {
+    /**
+     * @var bool Indicates whether the configuration form is enabled.
+     */
     protected $config_form = false;
 
     /**
-     * @throws Exception
+     * Constructor for the ChannelEngine module.
+     *
+     * Initializes the module with its name, description, and version, and ensures
+     * that the Bootstrap system is initialized. Additionally, it sets the minimum
+     * and maximum compatible PrestaShop versions.
+     *
+     * @throws Exception If there is an error during the initialization of the module.
      */
     public function __construct()
     {
@@ -72,6 +81,9 @@ class ChannelEngine extends Module
     /**
      * Install the module.
      *
+     * This method installs the module, registers necessary hooks, and sets up the
+     * database tables for storing credentials and product synchronization data.
+     *
      * @return bool True if installation was successful, false otherwise.
      */
     public function install()
@@ -83,6 +95,9 @@ class ChannelEngine extends Module
     /**
      * Uninstall the module.
      *
+     * This method uninstalls the module, unregisters hooks, and removes the
+     * database tables related to ChannelEngine.
+     *
      * @return bool True if uninstallation was successful, false otherwise.
      */
     public function uninstall()
@@ -91,19 +106,34 @@ class ChannelEngine extends Module
         return $installer->uninstall() && parent::uninstall();
     }
 
+    /**
+     * Redirects to the module's admin configuration page.
+     *
+     * This method handles the redirection to the module's admin interface where the
+     * user can configure the ChannelEngine settings.
+     */
     public function getContent()
     {
         $link = $this->context->link->getAdminLink('AdminChannelEngine');
         Tools::redirectAdmin($link);
     }
 
+    /**
+     * Hook that is triggered when a product is updated.
+     *
+     * This method listens for the `actionProductUpdate` hook and synchronizes the updated
+     * product with ChannelEngine. If synchronization is successful, a log is created. If
+     * an error occurs, it is logged as well.
+     *
+     * @param array $params Parameters passed by the hook, including the product ID.
+     * @return void
+     */
     public function hookActionProductUpdate($params)
     {
         if (isset($params['id_product'])) {
             $productId = (int) $params['id_product'];
 
             try {
-                // Koristi servis za sinhronizaciju
                 $syncService = ServiceRegistry::getInstance()->get(SyncServiceInterface::class);
                 $syncService->syncSingleProduct($productId);
 
