@@ -15,11 +15,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
             let data = await response.json();
 
-            if (data.success) {
-                syncStatus.innerHTML = '<span class="sync-done">Synchronization successful!</span>';
-            } else {
+            if (!data.success) {
                 syncStatus.innerHTML = '<span class="sync-error">Synchronization failed: ' + data.message + '</span>';
+                return;
             }
+
+            syncStatus.innerHTML = '<span class="sync-done">Synchronization successful!</span>';
         } catch (error) {
             console.error('Error:', error);
             syncStatus.innerHTML = '<span class="sync-error">An error occurred during synchronization</span>';
