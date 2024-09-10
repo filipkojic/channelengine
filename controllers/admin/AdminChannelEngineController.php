@@ -73,6 +73,7 @@ class AdminChannelEngineController extends ModuleAdminController
 
         $output = $this->context->smarty
             ->fetch($this->module->getLocalPath() . 'views/templates/admin/configure.tpl');
+
         $this->context->smarty->assign('content', $output);
     }
 
@@ -93,6 +94,7 @@ class AdminChannelEngineController extends ModuleAdminController
 
         $output = $this->context->smarty
             ->fetch($this->module->getLocalPath() . 'views/templates/admin/login.tpl');
+
         $this->context->smarty->assign('content', $output);
     }
 

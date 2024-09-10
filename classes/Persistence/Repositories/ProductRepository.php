@@ -27,7 +27,7 @@ class ProductRepository implements ProductRepositoryInterface
                 $rawProduct['id_product'],
                 $rawProduct['name'],
                 $rawProduct['description'] ?? '',
-                (float) $rawProduct['price']
+                (float)$rawProduct['price']
             );
         }
 
@@ -53,5 +53,4 @@ class ProductRepository implements ProductRepositoryInterface
             (float)$product->price
         );
     }
-
 }

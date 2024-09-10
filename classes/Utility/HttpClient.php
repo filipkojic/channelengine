@@ -19,7 +19,7 @@ class HttpClient extends Singleton
      * @return array The decoded JSON response as an associative array.
      * @throws \Exception If there is a cURL error or a non-2xx HTTP status code.
      */
-    public function get($url, array $headers = []): array
+    public function get(string $url, array $headers = []): array
     {
         $ch = curl_init();
 
@@ -57,7 +57,7 @@ class HttpClient extends Singleton
      * @return array The decoded JSON response as an associative array.
      * @throws \Exception If there is a cURL error or a non-2xx HTTP status code.
      */
-    public function post($url, array $data = [], array $headers = []) : array
+    public function post(string $url, array $data = [], array $headers = []): array
     {
         $ch = curl_init();
 

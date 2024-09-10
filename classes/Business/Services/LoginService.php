@@ -36,6 +36,7 @@ class LoginService implements LoginServiceInterface
         if ($response === true) {
             Configuration::updateValue('CHANNELENGINE_ACCOUNT_NAME', $accountName);
             Configuration::updateValue('CHANNELENGINE_API_KEY', $apiKey);
+
             return true;
         }
 

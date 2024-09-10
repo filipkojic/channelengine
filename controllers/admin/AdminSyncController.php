@@ -38,6 +38,7 @@ class AdminSyncController extends ModuleAdminController
 
         if (!method_exists($this, $action)) {
             $this->sendJsonResponse(false, 'Invalid action: ' . $action);
+
             return;
         }
 
@@ -62,6 +63,7 @@ class AdminSyncController extends ModuleAdminController
 
             if ($response !== true) {
                 $this->sendJsonResponse(false, 'Synchronization failed: Unknown error occurred');
+
                 return;
             }
 
@@ -91,6 +93,7 @@ class AdminSyncController extends ModuleAdminController
 
         header('Content-Type: application/json');
         echo json_encode($response);
+
         exit;
     }
 }

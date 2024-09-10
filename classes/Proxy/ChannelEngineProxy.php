@@ -5,7 +5,6 @@ namespace ChannelEngine\PrestaShop\Classes\Proxy;
 use ChannelEngine\PrestaShop\Classes\Business\Interfaces\ProxyInterfaces\ChannelEngineProxyInterface;
 use ChannelEngine\PrestaShop\Classes\Utility\HttpClient;
 use Configuration;
-use PrestaShopLogger;
 
 /**
  * Proxy class responsible for communication with the ChannelEngine API.
@@ -50,6 +49,7 @@ class ChannelEngineProxy implements ChannelEngineProxyInterface
         $url = 'https://' . Configuration::get('CHANNELENGINE_ACCOUNT_NAME') .
             '.channelengine.net/api/v2/products?apikey=' . Configuration::get('CHANNELENGINE_API_KEY');
         $headers = ['Content-Type: application/json'];
+        
         $response = $this->httpClient->post($url, $products, $headers);
 
         return $this->validateResponse($response);
@@ -74,5 +74,3 @@ class ChannelEngineProxy implements ChannelEngineProxyInterface
         throw new \Exception('API error: ' . ($response['Message'] ?? 'Unknown error'));
     }
 }
-
-

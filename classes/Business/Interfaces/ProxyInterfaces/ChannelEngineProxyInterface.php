@@ -2,6 +2,8 @@
 
 namespace ChannelEngine\PrestaShop\Classes\Business\Interfaces\ProxyInterfaces;
 
+use Exception;
+
 /**
  * Interface for ChannelEngineProxy, defining methods for API interactions
  * such as validating credentials and syncing products with ChannelEngine.
@@ -17,7 +19,7 @@ interface ChannelEngineProxyInterface
      * @param string $apiKey The API key to be validated.
      * @param string $accountName The account name to be validated.
      * @return bool True if the API key is valid, false otherwise.
-     * @throws \Exception Throws an exception if validation fails or the API is unreachable.
+     * @throws Exception Throws an exception if validation fails or the API is unreachable.
      */
     public function validateCredentials(string $apiKey, string $accountName): bool;
 
@@ -29,7 +31,7 @@ interface ChannelEngineProxyInterface
      *
      * @param array $products The array of products to be synchronized.
      * @return bool True if the synchronization was successful, false otherwise.
-     * @throws \Exception Throws an exception if the sync process fails or the API returns an error.
+     * @throws Exception Throws an exception if the sync process fails or the API returns an error.
      */
     public function syncProducts(array $products): bool;
 }

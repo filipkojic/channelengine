@@ -33,7 +33,7 @@ class ChannelEngineInstaller
      *
      * @param Module $module The module instance used for installation/uninstallation.
      */
-    public function __construct($module)
+    public function __construct(Module $module)
     {
         $this->module = $module;
     }
@@ -97,10 +97,13 @@ class ChannelEngineInstaller
     {
         $tabRepository = $this->module->get('prestashop.core.admin.tab.repository');
         $id_tab = (int)$tabRepository->findOneIdByClassName('AdminChannelEngine');
+
         if ($id_tab) {
             $tab = new Tab($id_tab);
+
             return $tab->delete();
         }
+
         return false;
     }
 
@@ -135,6 +138,4 @@ class ChannelEngineInstaller
 
         return $result;
     }
-
-
 }

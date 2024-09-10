@@ -77,8 +77,8 @@ class SyncService implements SyncServiceInterface
     public function getFormattedProducts(int $langId): array
     {
         $allProducts = Product::getProducts($langId, 0, 0, 'id_product', 'ASC');
-
         $products = [];
+
         foreach ($allProducts as $productData) {
             $product = [
                 'MerchantProductNo' => $productData['id_product'],

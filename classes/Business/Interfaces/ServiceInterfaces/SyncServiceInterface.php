@@ -1,6 +1,7 @@
 <?php
 
-namespace ChannelEngine\PrestaShop\Classes\Business\Interfaces\ServiceInterfaces;;
+namespace ChannelEngine\PrestaShop\Classes\Business\Interfaces\ServiceInterfaces;
+;
 
 /**
  * Interface for the Sync Service, defining methods for synchronizing products with ChannelEngine.
